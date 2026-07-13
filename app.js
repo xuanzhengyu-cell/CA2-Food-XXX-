@@ -31,7 +31,7 @@ connection.connect((err) => {
     console.log('Connected to MySQL database'); 
 }); 
  
-// Set up view engine 
+// Set up view engine hi
 app.set('view engine', 'ejs'); 
 //  enable static files 
 app.use(express.static('public')); 
