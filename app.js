@@ -40,11 +40,12 @@ app.use(express.urlencoded ({
   extended: false
 }));
 
-// Note: we need a theme on what to create, recommendation: best not be something too generic....
+// Note: Our Theme will be on Food Store
 
 // Assets
-// - 2 sql tables: one for username + password + position
-//                 one for <>'s id + data + sorting variable
+// - 3 sql tables: one for username + password + position + user id
+//                 one for store id, store location, store name, store picture, owner(user id) and comments section id
+//                 one for comments id, comments text, owner(user id), favourites (likes?)
 // - 4 (? may add more) positions. 
 // - Projected pages: Login page, Home page (*display all groups existing + admin messages), Group page (to display data), Adding page, Editing page, 
 //                    Admin's Page (for site mods), Group Owner Page (for group page mods), (? more to be added)
@@ -55,15 +56,21 @@ app.use(express.urlencoded ({
     //    - Site Admins can CRUD everything, plus give other users permission up to Admin. 
     //      - They also can hold the permission to create a new group. 
     //      - They can kick and add users into groups freely.  
+    //      - They are the site admins. 
     //
     //    - Group Owners can CRUD everything in their group, but will have the same privilege in other groups as per normal users. 
     //      - They can give others permission up to group owner ONLY for their OWN group.
-    //      - They can can ONLY kick and add people into their OWN group. 
+    //      - They can ONLY kick and add people into their OWN group. 
+    //      - They are the location shop owners (Lot One, Jurong Point etc). 
     //
     //    -  Group Members can CRUD their OWN messages in the group they belong to, and the rest is the same as a group user. 
     //      - They can invite users to the group, but whether they will enter or not is up to the Group Owner. 
+    //      - They are the shop/stall owners (McDonald's, KFC, etc)
+    //      - Group members can register for comment removal, but it is up to the group owner to decide whether they want to remove or not. 
     //
-    //    -  Normal users can only Read. (Unauthorised Guests will belong here too.)
+    //    -  Normal users can: 
+    //      - They can CRUD their own comments 
+    //      - They are the normal users of the website. 
 
 
 // Route: Creation of <>
