@@ -69,6 +69,8 @@ app.use(express.urlencoded ({
     //    -  Normal users can: 
     //      - They can CRUD their own comments 
     //      - They are the normal users of the website. 
+    // 
+    //    - Non-authorised users can only read, they cannot do anything else. 
 
 //    - How to create? What to add in? 
 //    - Regardless, remember to ensure that the SQL table (for data) can accept it. 
