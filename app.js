@@ -1,13 +1,15 @@
 // Import required modules
 const express = require('express'); 
 const mysql = require('mysql2'); 
+const session = require('express-session');
+const flash = require('connect-flash');
 const app = express(); 
 const multer = require ('multer');
 
-  // Set up multer for file uploads
+// Set up multer for file uploads
 const storage = multer.diskStorage({
 destination: (req, file, cb) => {
-cb(null, 'public/images'); // Directory to save uploaded files
+cb(null, 'public/images'); 
 },
 filename: (req, file, cb) => {
 cb(null, file.originalname); 
@@ -22,7 +24,6 @@ const connection = mysql.createConnection({
     password: 'RP738964$', 
     database: 'to_be_confirmed' 
 }); 
- 
 connection.connect((err) => { 
     if (err) { 
         console.error('Error connecting to MySQL:', err); 
@@ -30,12 +31,23 @@ connection.connect((err) => {
     } 
     console.log('Connected to MySQL database'); 
 }); 
- 
+
+// Session Creation
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    // Session expires after 1 week of inactivity
+    cookie: {maxAge: 1000 * 60 * 60 * 24 * 7}
+}));
+
+// 
+
+
 // Set up view engine 
 app.set('view engine', 'ejs'); 
 //  enable static files 
 app.use(express.static('public')); 
-
 app.use(express.urlencoded ({
   extended: false
 }));
@@ -43,17 +55,17 @@ app.use(express.urlencoded ({
 // Note: Our Theme will be on Food Store
 
 // Assets
-// - 4 sql tables: one for username + password +  user id + position + group id (if any) 
+// - 4 sql tables: one for username + password +  user id + position + location id (if any) 
 //                 one for location id, location name
-//                 one for store id, location id (for the store location), user id (for the owner of the store), store name, store picture and comments section id
 //                 one for messages id, location id, store id, text, date, favourites
-//                 one for comments id, store id, owner(user id),  comments text, likes count
+//                 one for comments id, user id,  comments text
 // - 4 (? may add more) positions. 
 // - Projected pages: Login page, Home page (*display all groups existing + admin messages), Group page (to display data), Adding page, Editing page, 
 //                    Admin's Page (for site mods), Group Owner Page (for group page mods), (? more to be added), User Page (for personal mods)
 
 //   - Typically: 
     //    - Site Admins can CRUD everything and grant other users up to Admin permissions. 
+    //      - They can post messages onto the main home page that only group owners and admins can see. 
     //      - They can also hold permission to create a new group. 
     //      - They can kick and add users into groups freely.  
     //      - They are the site admins. 
