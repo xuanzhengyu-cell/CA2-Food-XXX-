@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Food Stalls</title>
+</head>
+<body>
+
+  <h1>Food Stalls</h1>
+
+  <%- include('searchbar', { filters: filters }) %>
+
+  <ul>
+    <% if (stalls.length === 0) { %>
+      <li>No stalls found.</li>
+    <% } else { %>
+      <% stalls.forEach(function(stall) { %>
+        <li>
+          <strong><%= stall.name %></strong>
+          - <%= stall.location %>
+          - <%= stall.cuisine %>
+          - <%= stall.price_range %>
+          - Rating: <%= stall.rating %>
+        </li>
+      <% }); %>
+    <% } %>
+  </ul>
+
+</body>
+</html>
