@@ -264,7 +264,7 @@ app.post('/user/:id/comment_create', checkAuthenticated, (req, res) => {
 // Location Group Routes
 // =============================================================================================================================
 
-/* 
+/*  dude re-read on the details files i sent 
 // Route: Edit of <>
 // Show the search page with all stalls by default
 app. get('/on-hold', (req, res) => {
