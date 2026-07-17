@@ -213,6 +213,37 @@ app.get('/admin_dashboard', checkAuthenticated, checkAdmin, (req, res) => {
     res.render('admin_dashboard', { user: req.session.user, logged_in});
 });
 
+app.get('/location_dashboard/:id', checkAuthenticated, checkGOwnerandAdmin, (req, res) => {
+    const id = parseInt(req.params.id);
+    res.render('G_Owner_dashboard', { user: req.session.user, logged_in, location_id: id});
+});
+
+app.get('/location/:id/message', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
+    const id = parseInt(req.params.id);
+
+    const sql = 'SELECT * FROM location WHERE location_id = ?';
+    connection.query(sql, [id], (err, results) => {
+        if (err) {
+            throw err;
+            res.redirect(`/location/${id}`);
+        }
+        // Save the credentials into a session cookie
+        if (results.length > 0) {
+            const location_name = results[0]; 
+            const location_id = id
+            res.render('message_create', 
+                { user: req.session.user, logged_in, location_id, location_name});
+        
+        } else {
+            // Invalid credentials
+            req.flash('error', 'Invalid email or password.');
+            res.redirect(`/location/${id}`);
+        }
+    });
+
+    
+});
+
 // =============================================================================================================================
 // Location Group Routes
 // =============================================================================================================================

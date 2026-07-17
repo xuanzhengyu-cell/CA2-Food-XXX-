@@ -39,13 +39,16 @@ side note:
   - username
   - password
   - role (admin / group_owner / group_member / normal_user)
-  - location_id (Can be left empty)
 
 - Table 2: location
   - location_id
   - location_name
 
-- Table 3: messages
+- Table 3: users_has_location
+  - user_id
+  - location_id
+
+- Table 4: messages
   - messages_id
   - location_id (The page that has the message)
   - sender_id (user_id of the user who sent the message)
@@ -53,7 +56,7 @@ side note:
   - date
   - likes
 
-- Table 4: comments 
+- Table 5: comments 
   - comments_id
   - sender_id
   - owner_id (The user whose page has this comment)
