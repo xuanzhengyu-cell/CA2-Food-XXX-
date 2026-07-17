@@ -1,0 +1,61 @@
+Note: Our Theme will be on Food Stores in Locations
+
+Assets
+- 4 sql tables: one for username + password +  user id + roles + location id (if any) 
+                one for location id, location name
+                one for messages id, location id, owner_id, sender_id, text, date, likes
+                one for comments id, user id,  comments text
+- 4 (? may add more) positions. 
+- Projected pages: Login page, Home page (*display all groups existing + admin messages), Group page (to display data), Adding page, Editing page, 
+                   Admin's Page (for site mods), Group Owner Page (for group page mods), (? more to be added), User Page (for personal mods)
+   - Typically: 
+    - Site Admins can CRUD everything and grant other users up to Admin permissions. 
+      - They can post messages onto the main home page that only group owners and admins can see. 
+      - They can also hold permission to create a new group. 
+      - They can kick and add users into groups freely.  
+      - They are the site admins. 
+
+    - Group Owners can CRUD everything in their group, but will have the same privilege in other groups as per normal users. 
+      - They can give others permission up to group owner ONLY for their OWN group.
+      - They can ONLY kick and add people into their OWN group. 
+      - They are the location shop owners (Lot One, Jurong Point etc). 
+
+    -  Group Members can CRUD their OWN messages in the group they belong to, and the rest is the same as a group user. 
+      - They are the shop/stall owners (McDonald's, KFC, etc)
+
+    -  Normal users can: 
+      - They can CRUD their own comments 
+      - They are the normal users of the website. 
+ 
+    - Non-authorised users can only read; they cannot do anything else. 
+
+- Regardless, remember to ensure that the SQL table (for data) can accept it.  
+Note that the encryption of the password is SHA2 (?, 256)
+
+Table Variables
+side note:
+- Table 1: users
+  - user_id
+  - username
+  - password
+  - role (admin / group_owner / group_member / normal_user)
+  - location_id (Can be left empty)
+
+- Table 2: location
+  - location_id
+  - location_name
+
+- Table 3: messages
+  - messages_id
+  - location_id (The page that has the message)
+  - sender_id (user_id of the user who sent the message)
+  - message_text
+  - date
+  - likes
+
+- Table 4: comments 
+  - comments_id
+  - sender_id
+  - owner_id (The user whose page has this comment)
+  - comments_text
+  - date 
