@@ -293,6 +293,37 @@ app.get('/user/edit/:id', checkAuthenticated, (req, res) => {
 });
     
 
+// post of edit_user (may remove the ability to edit ur role based on future discussion.)
+app.post('/user/edit/:id', checkAuthenticated, (req, res) => {
+    const id = req.params.id;
+
+    if (req.session.user.user_id != id && req.session.user.role !== "admin") {
+        req.flash('error', 'Access denied');
+        return res.redirect('/profile');
+    }
+
+    const { username, password, role } = req.body;
+
+    const sql = `
+        UPDATE users
+        SET username = ?, password = SHA2(?,256), role = ?
+        WHERE user_id = ?
+    `;
+    connection.query(sql, [username, password, role, id], (err) => {
+
+        if (err) throw err;
+
+        req.session.user.username = username;
+        req.session.user.role = role;// may remove this based on future discussion.
+
+        req.flash('success', 'Profile updated successfully.');
+        res.redirect('/profile');
+
+    });
+
+});
+
+
  /*
 // Show the search page with all stalls by default
 app. get('/on-hold', (req, res) => {
