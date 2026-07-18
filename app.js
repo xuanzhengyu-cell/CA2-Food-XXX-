@@ -219,27 +219,16 @@ app.get('/location_dashboard/:id', checkAuthenticated, checkGOwnerandAdmin, (req
 });
 
 app.get('/location/:id/message', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
-    const id = parseInt(req.params.id);
-
-    const sql = 'SELECT * FROM location WHERE location_id = ?';
-    connection.query(sql, [id], (err, results) => {
-        if (err) {
-            throw err;
-        }
-        // Save the credentials into a session cookie
-        if (results.length > 0) {
-            const location_name = results[0].location_name; 
-            const location_id = id
-            res.render('message_create', 
-                { user: req.session.user, logged_in, location_id, location_name});
-        
-        } else {
-            res.redirect(`/location/${id}`);
-        }
-    });
+    const location_id = parseInt(req.params.id);
+    res.render('message_create', 
+        { user: req.session.user, logged_in, location_id, location_name});
 });
 
-app.post('/user/:id/comment_create', checkAuthenticated, (req, res) => {
+// =============================================================================================================================
+// Input of data
+// =============================================================================================================================
+
+app.post('/user/:id/comment_create', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
     const id = parseInt(req.params.id);
     const {comment} = req.body;
 
@@ -250,9 +239,9 @@ app.post('/user/:id/comment_create', checkAuthenticated, (req, res) => {
 
     const owner_id = id
     const sender_id = req.session.user.user_id
-    
-    const sql = 'INSERT INTO comments (sender_id, owner_id, comments_text) VALUES (?, ?, ?)';
-    connection.query(sql, [sender_id, owner_id, comment], (err, result) => {
+    let date = new Date().toISOString().split('T')[0];
+    const sql = 'INSERT INTO comments (sender_id, owner_id, comments_text, date) VALUES (?, ?, ?, ?)';
+    connection.query(sql, [sender_id, owner_id, comment, date], (err, result) => {
         if (err) {
             throw err;
         }
@@ -264,9 +253,34 @@ app.post('/user/:id/comment_create', checkAuthenticated, (req, res) => {
 // Location Group Routes
 // =============================================================================================================================
 
-/*  dude re-read on the details files i sent 
+app.get('/location/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+
+    const sql = 'SELECT * FROM location WHERE location_id = ?';
+    connection.query(sql, [id], (err, results_l) => {
+        if (err) {
+            throw err;
+        } else {
+        let location_name = results_l[0].location_name; 
+        const sql = 'SELECT * FROM messages WHERE location_id = ?';
+        connection.query(sql, [id], (err, results_m) => {
+            if (err) {
+                throw err;
+            } else {
+                let messages = results_m
+                const location_id = id
+                res.render('location', 
+                    { user: req.session.user, logged_in, location_id, location_name, messages});
+            }
+        });
+        }
+    });
+});
+
+
+// =============================================================================================================================
 // Route: Edit of <>
-*/
+// =============================================================================================================================
 
 // edit of profile
 app.get('/user/edit/:id', checkAuthenticated, (req, res) => {
@@ -323,8 +337,8 @@ app.post('/user/edit/:id', checkAuthenticated, (req, res) => {
 
 });
 
+/*  dude re-read on the details files i sent 
 
- /*
 // Show the search page with all stalls by default
 app. get('/on-hold', (req, res) => {
   connection.query('SELECT * FROM stores', (err, results) => {
