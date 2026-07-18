@@ -266,6 +266,34 @@ app.post('/user/:id/comment_create', checkAuthenticated, (req, res) => {
 
 /*  dude re-read on the details files i sent 
 // Route: Edit of <>
+*/
+
+// edit of profile
+app.get('/user/edit/:id', checkAuthenticated, (req, res) => {
+    const id = req.params.id;
+
+    if (req.session.user.user_id != id && req.session.user.role !== "admin") {
+        req.flash('error', 'Access denied');
+        return res.redirect('/profile');
+    }
+ 
+    const sql = "SELECT * FROM users WHERE user_id = ?";
+ 
+    connection.query(sql, [id], (err, results) => {
+        if (err) throw err;
+        if (results.length === 0) {
+            return res.redirect('/profile');
+             }
+
+        res.render('edit_user', {
+            user: results[0],
+            logged_in
+        });
+    });
+});
+    
+
+ /*
 // Show the search page with all stalls by default
 app. get('/on-hold', (req, res) => {
   connection.query('SELECT * FROM stores', (err, results) => {
