@@ -9,8 +9,18 @@
 </head>
 <body>
     <%- include ('header/header.ejs')%>
-    <a href="/logout">
-        <button type="submit" class="btn btn-light border-black border-2">Log Out</button>
-    </a>
+
+    <div class="container mt-4">
+
+        <!-- edit button wzy -->
+        <a href="/user/edit/<%= user.user_id %>" class="btn btn-warning">
+            Edit Profile
+        </a>
+
+
+        <a href="/logout">
+            <button type="submit" class="btn btn-light border-black border-2">Log Out</button>
+        </a>
+    </div>
 </body>
 </html>
