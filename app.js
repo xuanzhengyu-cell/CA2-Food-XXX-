@@ -236,9 +236,10 @@ app.get('/admin_dashboard', checkAuthenticated, locationIDs_Find, checkAdmin, (r
     res.render('HP_admin_dashboard', {});
 });
 
-app.get('/location_GPdashboard/:id', checkAuthenticated, locationIDs_Find, checkGOwnerandAdmin, (req, res) => {
-    const id = parseInt(req.params.id);
-    res.render('GP_Owner_dashboard', {});
+app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
+    const location_id = parseInt(req.params.id);
+    res.render('message_create', 
+        {});
 });
 
 // =============================================================================================================================
@@ -410,7 +411,7 @@ app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnerA
             return res.redirect('/');
         }
 
-        res.render('edit_location', {
+        res.render('GP_Owner_dashboard', {
             location: results[0],
         });
     });
