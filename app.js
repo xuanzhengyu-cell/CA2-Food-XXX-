@@ -358,6 +358,26 @@ app.get('/location/edit/:id', checkAuthenticated, (req, res) => {
 });
 
 
+// edit for location (post)
+app.post('/location/edit/:id', checkAuthenticated, (req, res) => {
+
+    const id = req.params.id;
+    const { location_name } = req.body;
+    const sql = `
+        UPDATE location
+        SET location_name = ?
+        WHERE location_id = ?
+    `;
+
+    connection.query(sql, [location_name, id], (err) => {
+        if (err) throw err;
+
+        req.flash('success', 'Location updated successfully.');
+        res.redirect('/');
+
+    });
+});
+
 
 /*  dude re-read on the details files i sent 
 
