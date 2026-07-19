@@ -66,7 +66,8 @@ if (req.session.user) {
                      FROM location 
                      INNER JOIN users_has_location 
                      ON location.location_id = users_has_location.location_id 
-                     WHERE user_id = ?`;            connection.query(sql, [user_id], (err, results) => {
+                     WHERE user_id = ?`;            
+        connection.query(sql, [user_id], (err, results) => {
             if (err) {
                 throw err;
             } else {

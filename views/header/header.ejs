@@ -10,19 +10,19 @@
           <a class="nav-link" href="/">Home Page</a>
         </li>
         <% if (user != null) { %>
-          <% if (user.role === "admin") {%>
-            <li class="nav-item">
-              <a class="nav-link" href="/admin_dashboard">Admin's Dashboard</a>
-            </li>
-          <% } %>
           <% for (let i = 0; i < location_ids.length; i++) {%>
             <li class="nav-item">
-              <a class="nav-link" href="/location/<% location_ids[i].location_id%>"></a>
+              <a class="nav-link" href="/location/<%= location_ids[i].location_id%>"><%= location_ids[i].location_name%></a>
             </li>
           <% } %>
           <li class="nav-item">
             <a class="nav-link" href="/profile">Profile</a>
           </li>
+          <% if (user.role === "admin") {%>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin_dashboard">Admin's Dashboard</a>
+            </li>
+          <% } %>
           <li class="nav-item">
             <a class="nav-link" href="/logout">Logout</a>
           </li>
