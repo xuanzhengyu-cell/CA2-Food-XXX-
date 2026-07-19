@@ -465,19 +465,17 @@ app.get('/message/edit/:id', checkAuthenticated, (req, res) => {
 app.post('/message/edit/:id', checkAuthenticated, (req, res) => {
 
     const id = req.params.id;
-    const { location_id, sender_id, text, date, likes } = req.body;
+    const { text } = req.body;
     const sql = `
         UPDATE messages
         SET
-            location_id = ?,
-            sender_id = ?,
             text = ?,
-            date = ?,
-            likes = ?
+            date = CURDATE(),
+            likes = 0
         WHERE messages_id = ?
     `;
 
-    connection.query(sql, [location_id, sender_id, text, date, likes, id], (err) => {
+    connection.query(sql, [text, id], (err) => {
 
         if (err) throw err;
 
