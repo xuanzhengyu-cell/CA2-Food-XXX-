@@ -18,18 +18,78 @@
             <form action="/user/edit/<%= user.user_id %>" method="POST">
 
                 <!-- user id -->
+                <div class="mb-3">
+                    <label>User ID</label>
+                    <input type="text" class="form-control" value="<%= user.user_id %>" readonly>
+                </div>
+
                 <!-- user name -->
+                <div class="mb-3">
+                    <label>Username</label>
+                    <input type="text" name="username" class="form-control" value="<%= user.username %>" required>
+                </div>
+
                 <!-- user ps -->
+                <div class="mb-3">
+                    <label>New Password</label>
+                    <input type="password" name="password" class="form-control"
+                        placeholder="Leave blank if you don't want to change it">
+                </div>
 
-                <button type="submit" class="btn btn-success">
-                    Save Changes
-                </button>
+                <!-- user role(maybe not doing this.) -->
+                <% if (currentUser.role==="admin" || currentUser.role==="group_owner" ) { %>
+                    <div class="mb-3">
+                        <label>Role</label>
+                        <select name="role" class="form-select">
 
-                <a href="/profile" class="btn btn-secondary">
-                    Cancel
-                </a>
+                            <% if (currentUser.role==="admin" ) { %>
+
+                                <option value="admin" <%=user.role==="admin" ? "selected" : "" %>>
+                                    Admin
+                                </option>
+
+                                <option value="normal_user" <%=user.role==="normal_user" ? "selected" : "" %>>
+                                    Normal User
+                                </option>
+
+                                <option value="group_owner" <%=user.role==="group_owner" ? "selected" : "" %>>
+                                    Group Owner
+                                </option>
+
+                                <option value="group_member" <%=user.role==="group_member" ? "selected" : "" %>>
+                                    Group Member
+                                </option>
+
+                                <% } else { %>
+
+                                    <option value="group_owner" <%=user.role==="group_owner" ? "selected" : "" %>>
+                                        Group Owner
+                                    </option>
+
+                                    <option value="group_member" <%=user.role==="group_member" ? "selected" : "" %>>
+                                        Group Member
+                                    </option>
+
+                                    <% } %>
+
+                        </select>
+
+                    </div>
+
+                    <% } %>
+
+
+
+                        <button type="submit" class="btn btn-success">
+                            Save Changes
+                        </button>
+
+                        <a href="/profile" class="btn btn-secondary">
+                            Cancel
+                        </a>
             </form>
 
         </div>
 </body>
+
 </html>

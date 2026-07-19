@@ -383,7 +383,6 @@ app.post('/profile/edit', checkAuthenticated, (req, res) => {
     }
 
     const { username, password, role } = req.body;
-
     const sql = `
         UPDATE users
         SET username = ?, password = SHA2(?,256), role = ?
@@ -397,13 +396,35 @@ app.post('/profile/edit', checkAuthenticated, (req, res) => {
 
         req.session.user.username = username;
         req.session.user.role = role;// may remove this based on future discussion.
-
         req.flash('success', 'Profile updated successfully.');
         res.redirect('/profile');
 
     });
-
 });
+
+
+// edit for location (get)
+app.get('/location/edit/:id', checkAuthenticated, (req, res) => {
+
+    const id = req.params.id;
+    const sql = "SELECT * FROM location WHERE location_id = ?";
+
+    connection.query(sql, [id], (err, results) => {
+
+        if (err) throw err;
+
+        if (results.length === 0) {
+            req.flash('error', 'Location not found.');
+            return res.redirect('/');
+        }
+
+        res.render('edit_location', {
+            location: results[0],
+        });
+    });
+});
+
+
 
 // =============================================================================================================================
 // Route: search for XXX, by YYY
