@@ -53,11 +53,36 @@ app.use(flash());
 // Middleware 
 // =============================================================================================================================
 // record
-let logged_in = false 
 
 // Set Up login, registration, access control 
     // For access control (Check Admin, Check Group Owner + Admin, Check Group Owner + Member + admin)
         // Middleware to check if user is logged in
+
+const locationIDs_Find = (req, res, next) => {
+    res.locals.location_ids = []; 
+    res.locals.user = req.session.user || null;
+
+if (req.session.user) {
+        const user_id = req.session.user.user_id;
+        const sql = `SELECT location.location_id, location.location_name 
+                     FROM location 
+                     INNER JOIN users_has_location 
+                     ON location.location_id = users_has_location.location_id 
+                     WHERE user_id = ?`;            connection.query(sql, [user_id], (err, results) => {
+            if (err) {
+                throw err;
+            } else {
+                res.locals.location_ids = []; 
+                res.locals.user = req.session.user || null;
+                res.locals.location_ids = results;
+                return next();
+            }
+            })
+    } else {
+        next();
+    }
+};
+
 const checkAuthenticated = (req, res, next) => {
     if (req.session.user) {
         return next();
@@ -133,19 +158,19 @@ const validateRegistration = (req, res, next) => {
 // Home Page + Login + Registration Routes
 // =============================================================================================================================
 
-// Home page route
-app.get('/', (req, res) => {
-    res.render('home_page', { user: req.session.user, messages: req.flash('success'), logged_in});
+    // Home page route
+app.get('/', locationIDs_Find, (req, res) => {
+    res.render('Home_Page', {});
 });
 
     // Route for login
-app.get('/login', (req, res) => {
-    res.render('login', { messages: req.flash('success'), errors: req.flash('error'), logged_in });
+app.get('/login', locationIDs_Find, (req, res) => {
+    res.render('HP_login', { messages: req.flash('success'), errors: req.flash('error')});
 });
 
     // Route for registration
-app.get('/register', (req, res) => {
-    res.render('register', { messages: req.flash('error'), formData: req.flash('formData')[0], logged_in });
+app.get('/register', locationIDs_Find, (req, res) => {
+    res.render('HP_register', { messages: req.flash('error'), formData: req.flash('formData')[0] });
 });
 
     // Process login
@@ -167,8 +192,8 @@ app.post('/login', (req, res) => {
         if (results.length > 0) {
             // Successful login
             req.session.user = results[0]; 
+            location_ids = []
             req.flash('success', 'Login successful!');
-            logged_in = true
             res.redirect('/');
         
         } else {
@@ -194,13 +219,13 @@ app.post('/register',validateRegistration, (req, res) => {
     });
 });
 
-app.get('/profile', (req, res) => {
-    res.render('profile', { user: req.session.user, logged_in});
+app.get('/profile', locationIDs_Find, (req, res) => {
+    res.render('HP_profile', {});
 });
 
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
-        logged_in = 0
+        location_ids = 0
         res.redirect('/');
     });
 });
@@ -209,19 +234,19 @@ app.get('/logout', (req, res) => {
 // Access to Dashboards Routes
 // =============================================================================================================================
 
-app.get('/admin_dashboard', checkAuthenticated, checkAdmin, (req, res) => {
-    res.render('admin_dashboard', { user: req.session.user, logged_in});
+app.get('/admin_dashboard', checkAuthenticated, locationIDs_Find, checkAdmin, (req, res) => {
+    res.render('HP_admin_dashboard', {});
 });
 
-app.get('/location_dashboard/:id', checkAuthenticated, checkGOwnerandAdmin, (req, res) => {
+app.get('/location_GPdashboard/:id', checkAuthenticated, locationIDs_Find, checkGOwnerandAdmin, (req, res) => {
     const id = parseInt(req.params.id);
-    res.render('G_Owner_dashboard', { user: req.session.user, logged_in, location_id: id});
+    res.render('GP_Owner_dashboard', {});
 });
 
-app.get('/location/:id/message', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
+app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
     const location_id = parseInt(req.params.id);
     res.render('message_create', 
-        { user: req.session.user, logged_in, location_id, location_name});
+        {});
 });
 
 // =============================================================================================================================
@@ -253,7 +278,8 @@ app.post('/user/:id/comment_create', checkAuthenticated, checkGOwnerAdminandMemb
 // Location Group Routes
 // =============================================================================================================================
 
-app.get('/location/:id', (req, res) => {
+// Get location page (dynamic)
+app.get('/location/:id', locationIDs_Find, (req, res) => {
     const id = parseInt(req.params.id);
 
     const sql = 'SELECT * FROM location WHERE location_id = ?';
@@ -269,28 +295,71 @@ app.get('/location/:id', (req, res) => {
             } else {
                 let messages = results_m
                 const location_id = id
-                res.render('location', 
-                    { user: req.session.user, logged_in, location_id, location_name, messages});
+                res.render('GP_location', 
+                    { location_id, location_name, messages});
             }
         });
         }
     });
 });
 
+// Get list of group members (display + click user to go to their page ONLY)
+app.get('/location_members/:id', locationIDs_Find, (req, res) => {
+    const id = parseInt(req.params.id);
+
+    const sql = 'SELECT * FROM location WHERE location_id = ?';
+    connection.query(sql, [id], (err, results_l) => {
+        if (err) {
+            throw err;
+        } else {
+        let location_name = results_l[0].location_name; 
+        const sql = 'SELECT users.users_id, users.username FROM users_has_location INNER JOIN users ON users_has_location.user_id = users.users_id WHERE location_id = ?';
+        connection.query(sql, [id], (err, results_m) => {
+            if (err) {
+                throw err;
+            } else {
+                let messages = results_m
+                const location_id = id
+                res.render('GP_Group_Members', 
+                    {location_id, location_name, messages});
+            }
+        });
+        }
+    });
+});
+
+// get user page (dynamic)
+app.get('/user/:id', locationIDs_Find, (req, res) => {
+    const id = parseInt(req.params.id);
+    const user_id = id
+    const sql = 'SELECT * FROM users WHERE user_id = ?';
+    connection.query(sql, [user_id], (err, results_l) => {
+        if (err) {
+            throw err;
+        } else {
+        let username = results_l[0].username; 
+        const sql = 'SELECT * FROM comments WHERE owner_id = ?';
+        connection.query(sql, [user_id], (err, results_m) => {
+            if (err) {
+                throw err;
+            } else {
+                let comments = results_m
+                res.render('GP_user', 
+                    {user_id, username, comments});
+            }
+        });
+        }
+    });
+});
 
 // =============================================================================================================================
 // Route: Edit of <>
 // =============================================================================================================================
 
-// edit of profile
-app.get('/user/edit/:id', checkAuthenticated, (req, res) => {
-    const id = req.params.id;
+// Edit of profile
+app.get('/profile/edit', checkAuthenticated, (req, res) => {
+    const id = req.session.user.user_id
 
-    if (req.session.user.user_id != id && req.session.user.role !== "admin") {
-        req.flash('error', 'Access denied');
-        return res.redirect('/profile');
-    }
- 
     const sql = "SELECT * FROM users WHERE user_id = ?";
  
     connection.query(sql, [id], (err, results) => {
@@ -299,16 +368,13 @@ app.get('/user/edit/:id', checkAuthenticated, (req, res) => {
             return res.redirect('/profile');
              }
 
-        res.render('edit_user', {
-            user: results[0],
-            logged_in
-        });
+        res.render('HP_P_edit_user', {});
     });
 });
     
 
 // post of edit_user (may remove the ability to edit ur role based on future discussion.)
-app.post('/user/edit/:id', checkAuthenticated, (req, res) => {
+app.post('/profile/edit', checkAuthenticated, (req, res) => {
     const id = req.params.id;
 
     if (req.session.user.user_id != id && req.session.user.role !== "admin") {
@@ -325,7 +391,9 @@ app.post('/user/edit/:id', checkAuthenticated, (req, res) => {
     `;
     connection.query(sql, [username, password, role, id], (err) => {
 
-        if (err) throw err;
+        if (err) {
+            throw err
+        };
 
         req.session.user.username = username;
         req.session.user.role = role;// may remove this based on future discussion.
@@ -337,65 +405,9 @@ app.post('/user/edit/:id', checkAuthenticated, (req, res) => {
 
 });
 
-/*  dude re-read on the details files i sent 
-
-// Show the search page with all stalls by default
-app. get('/on-hold', (req, res) => {
-  connection.query('SELECT * FROM stores', (err, results) => {
-    if (err) throw err;
-    res.render('results', { stalls: results, filters: {} });
-  });
-});
-
-// Handle search + filters
-app.post('/stalls', (req, res) => {
-  const { search, location, cuisine, rating, price } = req.query;
-
-  // Start with a base query, add conditions only for filters that were used
-  let sql = 'SELECT * FROM stores WHERE 1=1';
-  const values = [];
-
-  if (search) {
-    sql += ' AND (name LIKE ? OR description LIKE ?)';
-    values.push('%' + search + '%', '%' + search + '%');
-  }
-
-  if (location) {
-    sql += ' AND location = ?';
-    values.push(location);
-  }
-
-  if (cuisine) {
-    sql += ' AND cuisine = ?';
-    values.push(cuisine);
-  }
-
-  if (rating) {
-    sql += ' AND rating >= ?';
-    values.push(rating);
-  }
-
-  if (price) {
-    sql += ' AND price_range = ?';
-    values.push(price);
-  }
-
-  // '?' placeholders instead of pasting values straight into the string
-  // is what keeps this safe from SQL injection
-  connection.query(sql, values, (err, results) => {
-    if (err) throw err;
-    res.render('results', { stalls: results, filters: req.query });
-  });
-});
-
-// Route: Delete of <>
-
-
-// Route: Sorting of <> 
-
-*/
-
-
+// =============================================================================================================================
+// Route: search for XXX, by YYY
+// =============================================================================================================================
 
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`)); 

@@ -1,33 +1,37 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Foodie Lookie</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="/">Home Page</a>
-          </li>
-          <% if (logged_in ) { %>
-            <% if (user.role === "admin") {%>
-              <li class="nav-item">
-                <a class="nav-link" href="/admin_dashboard">Admin's Dashboard</a>
-              </li>
-            <% } %>
-            <%  %>
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Foodie Lookie</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home Page</a>
+        </li>
+        <% if (location_id.len() != 0) { %>
+          <% if (user.role === "admin") {%>
             <li class="nav-item">
-              <a class="nav-link" href="/profile">Profile</a>
+              <a class="nav-link" href="/admin_dashboard">Admin's Dashboard</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/logout">Logout</a>
-            </li>
-          <% } else { %>
-            <li class="nav-item">
-              <a class="nav-link" href="/login">Login</a>
-            </li>  
           <% } %>
-        </ul>
-      </div>
+          <% for (let i = 0; i < location_ids.length; i++) {%>
+            <li class="nav-item">
+              <a class="nav-link" href="/location/<% location_ids[i].location_id>"></a>
+            </li>
+          <% } %>
+          <li class="nav-item">
+            <a class="nav-link" href="/profile">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        <% } else { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>  
+        <% } %>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
