@@ -1,43 +1,34 @@
 <!-- searchbar.ejs -->
-<!-- A normal HTML form. Submitting it reloads the page with the
-     filters added as ?search=...&location=... etc, which app.js
-     reads with req.query -->
+<!-- Plain HTML form - submitting it reloads the page at
+     /search?location=...&date=...&likes=... -->
 
-<form action="/stalls" method="GET">
-  <input
-    type="text"
-    name="search"
-    placeholder="Search by name..."
-    value="<%= filters.search || '' %>"
-  >
-
+<form action="/search" method="GET">
   <input
     type="text"
     name="location"
-    placeholder="Location"
+    placeholder="Search by location name..."
     value="<%= filters.location || '' %>"
   >
 
-  <input
-    type="text"
-    name="cuisine"
-    placeholder="Cuisine"
-    value="<%= filters.cuisine || '' %>"
-  >
+  <label>
+    Posted on or after:
+    <input
+      type="date"
+      name="date"
+      value="<%= filters.date || '' %>"
+    >
+  </label>
 
-  <select name="rating">
-    <option value="">Any Rating</option>
-    <option value="4" <%= filters.rating === '4' ? 'selected' : '' %>>4 stars & up</option>
-    <option value="3" <%= filters.rating === '3' ? 'selected' : '' %>>3 stars & up</option>
-    <option value="2" <%= filters.rating === '2' ? 'selected' : '' %>>2 stars & up</option>
-  </select>
-
-  <select name="price">
-    <option value="">Any Price</option>
-    <option value="$" <%= filters.price === '$' ? 'selected' : '' %>>$</option>
-    <option value="$$" <%= filters.price === '$$' ? 'selected' : '' %>>$$</option>
-    <option value="$$$" <%= filters.price === '$$$' ? 'selected' : '' %>>$$$</option>
-  </select>
+  <label>
+    Minimum likes:
+    <input
+      type="number"
+      name="likes"
+      min="0"
+      placeholder="0"
+      value="<%= filters.likes || '' %>"
+    >
+  </label>
 
   <button type="submit">Search</button>
 </form>
