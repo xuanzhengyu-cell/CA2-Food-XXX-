@@ -52,8 +52,6 @@ app.use(flash());
 // =============================================================================================================================
 // Middleware 
 // =============================================================================================================================
-// record
-
 // Set Up login, registration, access control 
     // For access control (Check Admin, Check Group Owner + Admin, Check Group Owner + Member + admin)
         // Middleware to check if user is logged in
@@ -243,12 +241,6 @@ app.get('/location_GPdashboard/:id', checkAuthenticated, locationIDs_Find, check
     res.render('GP_Owner_dashboard', {});
 });
 
-app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
-    const location_id = parseInt(req.params.id);
-    res.render('message_create', 
-        {});
-});
-
 // =============================================================================================================================
 // Input of data
 // =============================================================================================================================
@@ -357,7 +349,7 @@ app.get('/user/:id', locationIDs_Find, (req, res) => {
 // =============================================================================================================================
 
 // Edit of profile
-app.get('/profile/edit', checkAuthenticated, (req, res) => {
+app.get('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
     const id = req.session.user.user_id
 
     const sql = "SELECT * FROM users WHERE user_id = ?";
@@ -404,7 +396,7 @@ app.post('/profile/edit', checkAuthenticated, (req, res) => {
 
 
 // edit for location (get)
-app.get('/location/edit/:id', checkAuthenticated, (req, res) => {
+app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
 
     const id = req.params.id;
     const sql = "SELECT * FROM location WHERE location_id = ?";
