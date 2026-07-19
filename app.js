@@ -190,7 +190,6 @@ app.post('/login', (req, res) => {
         if (results.length > 0) {
             // Successful login
             req.session.user = results[0]; 
-            location_ids = []
             req.flash('success', 'Login successful!');
             res.redirect('/');
         
@@ -223,7 +222,6 @@ app.get('/profile', locationIDs_Find, (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
-        location_ids = 0
         res.redirect('/');
     });
 });
