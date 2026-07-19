@@ -492,6 +492,44 @@ app.post('/message/edit/:id', checkAuthenticated, (req, res) => {
 // Route: search for XXX, by YYY
 // =============================================================================================================================
 
+app.get('/search', locationIDs_Find, (req, res) => {
+    const { location, date, likes } = req.query;
+
+    let sql = `
+        SELECT messages.messages_id, messages.text, messages.date, messages.likes,
+               location.location_id, location.location_name,
+               users.username AS sender_name
+        FROM messages
+        JOIN location ON messages.location_id = location.location_id
+        JOIN users ON messages.sender_id = users.user_id
+        WHERE 1=1
+    `;
+
+    const values = [];
+
+    if (location) {
+        sql += ' AND location.location_name LIKE ?';
+        values.push('%' + location + '%');
+    }
+
+    if (date) {
+        sql += ' AND messages.date >= ?';
+        values.push(date);
+    }
+
+    if (likes) {
+        sql += ' AND messages.likes >= ?';
+        values.push(likes);
+    }
+
+    sql += ' ORDER BY messages.date DESC';
+
+    connection.query(sql, values, (err, results) => {
+        if (err) throw err;
+        res.render('results', { messages: results, filters: req.query });
+    });
+});
+
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`)); 
 
