@@ -238,7 +238,7 @@ app.get('/admin_dashboard', checkAuthenticated, locationIDs_Find, checkAdmin, (r
 
 app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
     const location_id = parseInt(req.params.id);
-    res.render('message_create', 
+    res.render('GP_message_create', 
         {});
 });
 
