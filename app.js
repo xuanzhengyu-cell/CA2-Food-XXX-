@@ -372,6 +372,22 @@ app.get('/user/:id', locationIDs_Find, (req, res) => {
     });
 });
 
+// get location members list
+app.get('/location/members/:id', locationIDs_Find, (req, res) => {
+    const id = parseInt(req.params.id);
+    const location_id = id
+    const sql = 'SELECT users.user_id, users.username FROM users INNER JOIN users_has_location ON users.user_id = users_has_location.user_id WHERE location_id = ?';
+    connection.query(sql, [user_id], (err, results_l) => {
+        if (err) {
+            throw err;
+        } else {
+        let user_list = results_l[0]; 
+        res.render('GP_user', {user_id, user_list, comments});
+
+        }
+    });
+});
+
 // =============================================================================================================================
 // Route: Edit of <>
 // =============================================================================================================================
