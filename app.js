@@ -289,7 +289,7 @@ app.get('/user/:id/comment_create', checkAuthenticated, (req, res) => {
     connection.query(sql, [id], (err, results) => {
         if (err) throw err;
 
-        res.render('HP_admin_dashboard', {
+        res.render('comment_create', {
             user: results[0]
         });
     });

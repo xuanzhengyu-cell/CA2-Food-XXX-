@@ -1,23 +1,28 @@
+<h2>Leave a Comment for <%= user.username %></h2>
+
 <form action="/user/<%= user.user_id %>/comment_create" method="POST">
 
     <div class="mb-3">
-
-        <label class="form-label">
+        <label for="comment" class="form-label">
             Leave a Comment
         </label>
 
         <textarea
+            id="comment"
             class="form-control"
             name="comment"
             rows="5"
             placeholder="Write your comment here..."
             required
         ></textarea>
-
     </div>
 
     <button type="submit" class="btn btn-primary">
         Add Comment
     </button>
+
+    <a href="/user/<%= user.user_id %>" class="btn btn-secondary">
+        Cancel
+    </a>
 
 </form>
