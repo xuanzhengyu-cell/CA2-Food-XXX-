@@ -396,7 +396,7 @@ app.post('/profile/edit', checkAuthenticated, (req, res) => {
 
 
 // edit for location (get)
-app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
+app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnerandAdmin, (req, res) => {
 
     const id = req.params.id;
     const sql = "SELECT * FROM location WHERE location_id = ?";
