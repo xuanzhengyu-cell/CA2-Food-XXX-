@@ -12,8 +12,112 @@
     <h1>Admin Dashboard</h1>
 
     // See group lists
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h4>Group List</h4>
+        </div>
+
+        <div class="card-body">
+            <p>View all existing groups.</p>
+
+            <a href="/AD_groups_lists" class="btn btn-primary">
+                See Group List
+            </a>
+        </div>
+    </div>
+
+
     // Edit members 
-    // Send message in home page 
-    // 
+
+            <div class="card mb-4">
+
+            <div class="card-header">
+                <h4>Edit Members</h4>
+            </div>
+
+            <div class="card-body">
+
+                <table class="table table-bordered table-hover">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Location</th>
+                            <th>Role</th>
+                            <th>Change Role</th>
+                            <th>Delete</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+                        <% users.forEach(user=> { %>
+                            <tr>
+
+                                <td>
+                                    <%= user.user_id %>
+                                </td>
+
+                                <td>
+                                    <%= user.username %>
+                                </td>
+
+                                <td>
+                                    <%= user.location_name || "No Location" %>
+                                </td>
+
+                                <td>
+                                    <%= user.role %>
+                                </td>
+
+                                <td>
+                                    <form action="/admin/changeRole" method="POST">
+                                        <input type="hidden" name="user_id" value="<%= user.user_id %>">
+                                        <select name="role" class="form-select">
+
+                                            <option value="admin" <%=user.role=="admin" ?"selected":"" %>>
+                                                Admin
+                                            </option>
+
+                                            <option value="group_owner" <%=user.role=="group_owner" ?"selected":"" %>>
+                                                Group Owner
+                                            </option>
+
+                                            <option value="group_member" <%=user.role=="group_member" ?"selected":"" %>>
+                                                Group Member
+                                            </option>
+
+                                            <option value="normal_user" <%=user.role=="normal_user" ?"selected":"" %>>
+                                                Normal User
+                                            </option>
+
+                                        </select>
+
+                                        <button class="btn btn-success btn-sm mt-2">
+                                            Update
+                                        </button>
+
+                                    </form>
+                                </td>
+                                <td>
+
+                                    <form action="/admin/deleteUser" method="POST">
+                                        <input type="hidden" name="user_id" value="<%= user.user_id %>">
+
+                                        <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this user?')"> Delete </button>
+
+                                    </form>
+                                </td>
+                            </tr>
+                            <% }) %>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
 </body>
-</html>
+</html>    

@@ -1,0 +1,23 @@
+<form action="/user/<%= user.user_id %>/comment_create" method="POST">
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            Leave a Comment
+        </label>
+
+        <textarea
+            class="form-control"
+            name="comment"
+            rows="5"
+            placeholder="Write your comment here..."
+            required
+        ></textarea>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Add Comment
+    </button>
+
+</form>

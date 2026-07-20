@@ -1,0 +1,125 @@
+<!-- User Name Header -->
+<h2><%= user.name %></h2>
+
+<a href="/user/<%= user.user_id %>/comment_create" class="btn btn-primary">
+    Add Comment
+</a>
+
+<hr>
+
+<!-- Profile Picture -->
+<img
+    src="<%= user.profilePicture %>"
+    alt="Profile Picture"
+    width="150"
+>
+
+<br><br>
+
+<!-- User Information -->
+
+<p>
+    <strong>Name:</strong>
+    <%= user.name %>
+</p>
+
+<p>
+    <strong>Email:</strong>
+    <%= user.email %>
+</p>
+
+<p>
+    <strong>About Me:</strong>
+    <%= user.description %>
+</p>
+
+<p>
+    <strong>Member Since:</strong>
+    <%= user.created_at %>
+</p>
+
+<p>
+    <strong>Locations Joined:</strong>
+    <%= locations.length %>
+</p>
+
+<hr>
+
+<!-- User's Locations -->
+
+<h3>Locations</h3>
+
+<% if(locations.length === 0) { %>
+
+    <p>This user has not joined any locations.</p>
+
+<% } else { %>
+
+    <ul>
+
+    <% locations.forEach(function(location){ %>
+
+        <li>
+            <a href="/location/<%= location.id %>">
+                <%= location.locationName %>
+            </a>
+
+            <% if(location.role === "owner"){ %>
+                (Owner)
+            <% } %>
+
+        </li>
+
+    <% }) %>
+
+    </ul>
+
+<% } %>
+
+<hr>
+
+<!-- Comment Button -->
+
+<a href="/user/<%= user.id %>/comment_create">
+    Add Comment
+</a>
+
+<hr>
+
+<!-- Comments -->
+
+<h3>Comments</h3>
+
+<% if(comments.length === 0){ %>
+
+    <p>No comments yet.</p>
+
+<% } else { %>
+
+    <% comments.forEach(function(comment){ %>
+
+        <div>
+
+            <strong>
+                <%= comment.commenterName %>
+            </strong>
+
+            (<%= comment.rating %>/5)
+
+            <br>
+
+            <%= comment.comment %>
+
+            <br>
+
+            <small>
+                <%= comment.created_at %>
+            </small>
+
+            <hr>
+
+        </div>
+
+    <% }) %>
+
+<% } %>

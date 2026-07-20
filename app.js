@@ -267,6 +267,20 @@ app.post('/user/:id/comment_create', checkAuthenticated, checkGOwnerAdminandMemb
         res.redirect(`/user/${id}`);
     });
 });
+
+app.get('/user/:id/comment_create', checkAuthenticated, (req, res) => {
+    const id = req.params.id;
+
+    const sql = 'SELECT * FROM users WHERE user_id = ?';
+
+    connection.query(sql, [id], (err, results) => {
+        if (err) throw err;
+
+        res.render('comment_create', {
+            user: results[0]
+        });
+    });
+});
 // =============================================================================================================================
 // Location Group Routes
 // =============================================================================================================================
