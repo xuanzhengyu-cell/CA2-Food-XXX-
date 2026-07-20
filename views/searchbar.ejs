@@ -1,43 +1,45 @@
-<!-- searchbar.ejs -->
-<!-- A normal HTML form. Submitting it reloads the page with the
-     filters added as ?search=...&location=... etc, which app.js
-     reads with req.query -->
+<% var f = typeof filters !== 'undefined' ? filters : {}; %>
 
-<form action="/stalls" method="GET">
-  <input
-    type="text"
-    name="search"
-    placeholder="Search by name..."
-    value="<%= filters.search || '' %>"
-  >
+<form action="/search" method="GET" class="mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label for="location" class="form-label">Location</label>
+            <input
+                type="text"
+                id="location"
+                name="location"
+                class="form-control"
+                placeholder="Search by location name..."
+                value="<%= f.location || '' %>"
+            >
+        </div>
 
-  <input
-    type="text"
-    name="location"
-    placeholder="Location"
-    value="<%= filters.location || '' %>"
-  >
+        <div class="col-md-3">
+            <label for="date" class="form-label">Posted on or after</label>
+            <input
+                type="date"
+                id="date"
+                name="date"
+                class="form-control"
+                value="<%= f.date || '' %>"
+            >
+        </div>
 
-  <input
-    type="text"
-    name="cuisine"
-    placeholder="Cuisine"
-    value="<%= filters.cuisine || '' %>"
-  >
+        <div class="col-md-3">
+            <label for="likes" class="form-label">Minimum likes</label>
+            <input
+                type="number"
+                id="likes"
+                name="likes"
+                class="form-control"
+                min="0"
+                placeholder="0"
+                value="<%= f.likes || '' %>"
+            >
+        </div>
 
-  <select name="rating">
-    <option value="">Any Rating</option>
-    <option value="4" <%= filters.rating === '4' ? 'selected' : '' %>>4 stars & up</option>
-    <option value="3" <%= filters.rating === '3' ? 'selected' : '' %>>3 stars & up</option>
-    <option value="2" <%= filters.rating === '2' ? 'selected' : '' %>>2 stars & up</option>
-  </select>
-
-  <select name="price">
-    <option value="">Any Price</option>
-    <option value="$" <%= filters.price === '$' ? 'selected' : '' %>>$</option>
-    <option value="$$" <%= filters.price === '$$' ? 'selected' : '' %>>$$</option>
-    <option value="$$$" <%= filters.price === '$$$' ? 'selected' : '' %>>$$$</option>
-  </select>
-
-  <button type="submit">Search</button>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-light border-black border-2 w-100">Search</button>
+        </div>
+    </div>
 </form>

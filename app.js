@@ -417,10 +417,119 @@ app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnera
 });
 
 
+// edit for location (post)
+app.post('/location/edit/:id', checkAuthenticated, (req, res) => {
+
+    const id = req.params.id;
+    const { location_name } = req.body;
+    const sql = `
+        UPDATE location
+        SET location_name = ?
+        WHERE location_id = ?
+    `;
+
+    connection.query(sql, [location_name, id], (err) => {
+        if (err) throw err;
+
+        req.flash('success', 'Location updated successfully.');
+        res.redirect('/');
+
+    });
+});
+
+
+
+//edit message (get)
+app.get('/message/edit/:id', checkAuthenticated, (req, res) => {
+
+    const id = req.params.id;
+    const sql = "SELECT * FROM messages WHERE messages_id = ?";
+
+    connection.query(sql, [id], (err, results) => {
+
+        if (err) throw err;
+
+        if (results.length === 0) {
+            req.flash('error', 'Message not found.');
+            return res.redirect('/');
+        }
+
+        res.render('edit_message', {
+            message: results[0],
+            logged_in
+        });
+    });
+});
+
+
+//edit for message (Post)
+app.post('/message/edit/:id', checkAuthenticated, (req, res) => {
+
+    const id = req.params.id;
+    const { text } = req.body;
+    const sql = `
+        UPDATE messages
+        SET
+            text = ?,
+            date = CURDATE(),
+            likes = 0
+        WHERE messages_id = ?
+    `;
+
+    connection.query(sql, [text, id], (err) => {
+
+        if (err) throw err;
+
+        req.flash('success', 'Message updated successfully.');
+        res.redirect('/');
+
+    });
+});
+
+
+
 
 // =============================================================================================================================
 // Route: search for XXX, by YYY
 // =============================================================================================================================
+
+app.get('/search', locationIDs_Find, (req, res) => {
+    const { location, date, likes } = req.query;
+
+    let sql = `
+        SELECT messages.messages_id, messages.text, messages.date, messages.likes,
+               location.location_id, location.location_name,
+               users.username AS sender_name
+        FROM messages
+        JOIN location ON messages.location_id = location.location_id
+        JOIN users ON messages.sender_id = users.user_id
+        WHERE 1=1
+    `;
+
+    const values = [];
+
+    if (location) {
+        sql += ' AND location.location_name LIKE ?';
+        values.push('%' + location + '%');
+    }
+
+    if (date) {
+        sql += ' AND messages.date >= ?';
+        values.push(date);
+    }
+
+    if (likes) {
+        sql += ' AND messages.likes >= ?';
+        values.push(likes);
+    }
+
+    sql += ' ORDER BY messages.date DESC';
+
+    connection.query(sql, values, (err, results) => {
+        if (err) throw err;
+        res.render('results', { messages: results, filters: req.query });
+    });
+});
 
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`)); 
