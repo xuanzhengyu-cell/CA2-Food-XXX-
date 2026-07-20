@@ -273,6 +273,7 @@ app.get('/groups', (req, res) => {
             locations: results
         });
     });
+})
 
 app.post('/user/:id/comment_create', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
     const id = parseInt(req.params.id);
