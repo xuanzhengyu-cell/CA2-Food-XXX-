@@ -218,6 +218,7 @@ app.post('/register',validateRegistration, (req, res) => {
 });
 
 app.get('/profile', locationIDs_Find, (req, res) => {
+    req.
     res.render('HP_profile', {});
 });
 
