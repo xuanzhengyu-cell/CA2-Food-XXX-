@@ -3,14 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <title>Document</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <title>Location Groups</title>
 </head>
-<body >
-    // list of groups
-    // delete group button 
-    // add group button 
-    // click group name can go to G_owner dashboard of that location
+
+<body>
+
+<div class="container mt-5">
+
+    <h2>Existing Groups</h2>
+
+    <table class="table table-bordered table-hover">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Location ID</th>
+                <th>Location Name</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <% locations.forEach(function(location) { %>
+
+                <tr>
+                    <td><%= location.location_id %></td>
+                    <td><%= location.location_name %></td>
+                </tr>
+
+            <% }); %>
+
+        </tbody>
+
+    </table>
+
+</div>
+
 </body>
 </html>
