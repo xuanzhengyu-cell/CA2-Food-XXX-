@@ -259,6 +259,21 @@ app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwn
 // Input of data
 // =============================================================================================================================
 
+// Display all existing location groups- added by cy
+app.get('/groups', (req, res) => {
+
+    const sql = "SELECT * FROM location";
+
+    connection.query(sql, (err, results) => {
+        if (err) {
+            throw err;
+        }
+
+        res.render("AD_groups_lists", {
+            locations: results
+        });
+    });
+
 app.post('/user/:id/comment_create', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
     const id = parseInt(req.params.id);
     const {comment} = req.body;
