@@ -22,8 +22,9 @@
 
         <thead class="table-dark">
             <tr>
-                <th>Location ID</th>
-                <th>Location Name</th>
+                <th width="100">Location Name</th>
+                <th width="100"></th>
+                <th width="100"></th>
             </tr>
         </thead>
 
@@ -32,8 +33,10 @@
             <% locations.forEach(function(location) { %>
 
                 <tr>
-                    <td><%= location.location_id %></td>
                     <td><%= location.location_name %></td>
+                    <td><a href="/location/edit/<%= location.location_id %>">Edit</a></td>
+                    <td><a href="//<%= location.location_id %>">Delete</a></td>
+
                 </tr>
 
             <% }); %>

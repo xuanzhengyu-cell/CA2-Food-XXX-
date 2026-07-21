@@ -11,7 +11,6 @@
     <%- include ('header/header.ejs')%>
     <h1>Admin Dashboard</h1>
 
-    // See group lists
     <div class="card mb-4">
 
         <div class="card-header">
@@ -21,16 +20,28 @@
         <div class="card-body">
             <p>View all existing groups.</p>
 
-            <a href="/AD_groups_lists" class="btn btn-primary">
+            <a href="/groups" class="btn btn-primary">
                 See Group List
             </a>
         </div>
     </div>
 
+    <div class="card mb-4">
 
-   <a href="/edit_members" class="btn btn-primary">
-    Edit Members
-</a>
+        <div class="card-header">
+            <h4>Users List</h4>
+        </div>
+
+        <div class="card-body">
+            <p>View all existing users.</p>
+
+            <a href="/edit_members" class="btn btn-primary">
+                Edit Members
+            </a>
+        </div>
+    </div>
+
+   
 
             
     

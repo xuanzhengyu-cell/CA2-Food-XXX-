@@ -597,9 +597,12 @@ app.get('/edit_members', checkAuthenticated, checkAdmin, (req, res) => {
 // Route: search for XXX, by YYY
 // =============================================================================================================================
 
+app.get('/delete_location/:id', checkAuthenticated, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    sql = ''
+    res.redirect('/groups');
+});
+
 
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`)); 
-
-// Additional features: 
-//    - ???
