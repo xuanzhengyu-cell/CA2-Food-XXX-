@@ -235,18 +235,14 @@ app.get('/profile', locationIDs_Find, (req, res) => {
     res.render('HP_profile', {});
 });
 
+app.get('/admin_dashboard', checkAuthenticated, locationIDs_Find, checkAdmin, (req, res) => {
+    res.render('HP_admin_dashboard', {});
+});
+
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
         res.redirect('/');
     });
-});
-
-// =============================================================================================================================
-// Access to Dashboards Routes
-// =============================================================================================================================
-
-app.get('/admin_dashboard', checkAuthenticated, locationIDs_Find, checkAdmin, (req, res) => {
-    res.render('HP_admin_dashboard', {});
 });
 
 app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
@@ -261,21 +257,32 @@ app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwn
 
 // Display all existing location groups- added by cy
 app.get('/groups', (req, res) => {
-
     const sql = "SELECT * FROM location";
-
     connection.query(sql, (err, results) => {
         if (err) {
             throw err;
         }
-
         res.render("AD_groups_lists", {
             locations: results
         });
     });
 })
 
-app.post('/user/:id/comment_create', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
+app.get('/user/:id/comment_create', checkAuthenticated, (req, res) => {
+    const id = req.params.id;
+
+    const sql = 'SELECT * FROM users WHERE user_id = ?';
+
+    connection.query(sql, [id], (err, results) => {
+        if (err) throw err;
+
+        res.render('US_comment_create', {
+            user: results[0]
+        });
+    });
+});
+
+app.post('/user/:id/comment_create', checkAuthenticated, (req, res) => {
     const id = parseInt(req.params.id);
     const {comment} = req.body;
 
@@ -297,19 +304,7 @@ app.post('/user/:id/comment_create', checkAuthenticated, checkGOwnerAdminandMemb
     });
 });
 
-app.get('/user/:id/comment_create', checkAuthenticated, (req, res) => {
-    const id = req.params.id;
 
-    const sql = 'SELECT * FROM users WHERE user_id = ?';
-
-    connection.query(sql, [id], (err, results) => {
-        if (err) throw err;
-
-        res.render('US_comment_create', {
-            user: results[0]
-        });
-    });
-});
 // =============================================================================================================================
 // Location Group Routes
 // =============================================================================================================================
@@ -388,22 +383,6 @@ app.get('/user/:id', locationIDs_Find, (req, res) => {
     });
 });
 
-// get location members list
-app.get('/location/members/:id', locationIDs_Find, (req, res) => {
-    const id = parseInt(req.params.id);
-    const location_id = id
-    const sql = 'SELECT users.user_id, users.username FROM users INNER JOIN users_has_location ON users.user_id = users_has_location.user_id WHERE location_id = ?';
-    connection.query(sql, [user_id], (err, results_l) => {
-        if (err) {
-            throw err;
-        } else {
-        let user_list = results_l[0]; 
-        res.render('GP_user', {user_id, user_list, comments});
-
-        }
-    });
-});
-
 // =============================================================================================================================
 // Route: Edit of <>
 // =============================================================================================================================
@@ -445,34 +424,45 @@ app.post('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
         if (err) {
             throw err
         };
-
         req.session.user.username = username;
         req.session.user.role = role;// may remove this based on future discussion.
         req.flash('success', 'Profile updated successfully.');
         res.redirect('/profile');
-
     });
 });
 
 
 // edit for location (get)
 app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnerandAdmin, (req, res) => {
-
     const id = req.params.id;
     const sql = "SELECT * FROM location WHERE location_id = ?";
-
     connection.query(sql, [id], (err, results) => {
 
-        if (err) throw err;
+        if (err) {
+            throw err
 
-        if (results.length === 0) {
+        } else if (results.length === 0) {
             req.flash('error', 'Location not found.');
             return res.redirect('/');
-        }
 
-        res.render('GP_Owner_dashboard', {
-            location: results[0],
-        });
+        } else {
+            const location = results[0]
+            const sql = `
+                SELECT users.user_id, users.username 
+                FROM users 
+                LEFT JOIN users_has_location IN users_has_location.user_id = users.user_id
+                WHERE users_has_location.location_id = ?`
+            connection.query(sql, [id], (err, results) => {
+                if (err) {
+                    console.error('Failed:', err.message);
+                    req.flash('error', 'Cannot delete this location because it is linked to other items.');
+                    return res.redirect('/groups');
+                } else {
+                    const users = results
+                    res.render('GP_Owner_dashboard', {location, users});
+                }
+            })
+        }
     });
 });
 
@@ -498,7 +488,6 @@ app.post('/location/edit/:id', checkAuthenticated, locationIDs_Find, (req, res) 
 });
 
 
-
 //edit message (get)
 app.get('/message/edit/:id', checkAuthenticated, locationIDs_Find, (req, res) => {
 
@@ -514,17 +503,15 @@ app.get('/message/edit/:id', checkAuthenticated, locationIDs_Find, (req, res) =>
             return res.redirect('/');
         }
 
-        res.render('edit_message', {
+        res.render('GP_edit_message', {
             message: results[0],
             logged_in
         });
     });
 });
 
-
 //edit for message (Post)
 app.post('/message/edit/:id', checkAuthenticated,locationIDs_Find, (req, res) => {
-
     const id = req.params.id;
     const { text } = req.body;
     const sql = `
@@ -587,29 +574,32 @@ app.post('/comment/edit/:id', checkAuthenticated, checkGOwnerAdminandMember, loc
     });
 });
 
-// Edit Members page- cy
-app.get('/edit_members', checkAuthenticated, checkAdmin, locationIDs_Find, (req, res) => {
-    res.render('edit_members');
-});
-
-
 // =============================================================================================================================
 // Route: search for XXX, by YYY
 // =============================================================================================================================
 
 app.post ('/delete_location/:id', checkAuthenticated, locationIDs_Find, (req, res) => {
     const id = req.params.id;
-    const sql = `DELETE location, messages, users_has_location 
+    const sql1 = `
+        UPDATE users 
+        INNER JOIN users_has_location ON users_has_location.user_id = users.user_id 
+        SET users.role = "normal_user"
+        where users_has_location.location_id = ?`
+    connection.query (sql1, [id],(err) => {
+        if (err) {
+            console.error('Failed:', err.message);
+        }
+    })
+
+    const sql2 = `DELETE location, messages, users_has_location 
         FROM location 
         LEFT JOIN messages ON location.location_id = messages.location_id 
         LEFT JOIN users_has_location ON location.location_id = users_has_location.location_id
         WHERE location.location_id = ?
     `;
-    connection.query (sql, [id],(err) => {
+    connection.query (sql2, [id],(err) => {
         if (err) {
-            console.error('Delete failed:', err.message);
-            req.flash('error', 'Cannot delete this location because it is linked to other items.');
-            return res.redirect('/groups');
+            console.error('Failed:', err.message);
         } else {
             req.flash('success', 'Group deleted successfully.');
             res.redirect('/groups');

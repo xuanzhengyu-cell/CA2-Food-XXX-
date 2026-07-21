@@ -14,7 +14,7 @@
 <%- include('header/header.ejs') %>
 
 <div class="container mt-4">
-    <h2>Edit Location</h2>
+    <h2>Group: <%= location.location_name %></h2>
 
     <form action="/location/edit/<%= location.location_id %>" method="POST">
 

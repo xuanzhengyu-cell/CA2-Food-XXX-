@@ -62,3 +62,77 @@ side note:
   - owner_id (The user whose page has this comment)
   - comments_text
   - date 
+
+
+All routes:
+- get('/'                     
+~ to home page [Home_Page.ejs]
+
+- get('/login'                
+~ to login page [HP_login.ejs]
+
+- get('/register'             
+~ from login to registration page [HP_register.ejs]
+
+- post('/login'               
+~ process form reply from login page [HP_login.ejs]
+
+- post('/register'            
+~ process form reply from registration page [HP_register.ejs]
+
+- get('/profile'              
+~ from home to user own page [HP_profile]
+
+- get('/admin_dashboard'      
+~ from home to admin_dashboard [HP_admin_dashboard.ejs]
+
+- get('/logout'               
+~ end the session of the user 
+
+- get('/location/:id/message' 
+~ from group location [GP_location.ejs] to message creation [GP_message_create.ejs]
+
+- get('/groups'               
+~ from admin_dashboard [HP_admin_dashboard.ejs] to all groups list [AD_groups_lists.ejs]
+
+- get('/user/:id/comment_create'
+~ from user profile page [GP_user.ejs] to comment creation page [US_comment_create.ejs]
+
+- post('/user/:id/comment_create'
+~ process form reply from the comment adding page [US_comment_create.ejs]
+
+- get('/location/:id' 
+~ from home page [Home_Page.ejs] to the target location group page [GP_location.ejs]
+
+- get('/location_members/:id'
+~ from location group page [GP_location.ejs] to members list page [GP_Group_Members.ejs]
+
+- get('/user/:id' 
+~ from members list page [GP_Group_Members.ejs] to user profile page [GP_user.ejs]
+
+- get('/profile/edit'
+~ from user own page to edit user own page page [HP_P_edit_user.ejs]
+
+- post('/profile/edit' 
+~ process edit user own page page [HP_P_edit_user.ejs] data 
+
+- get('/location/edit/:id'
+~ from location group page [GP_location.ejs] to group owner dashboard [GP_Owner_dashboard.ejs]
+
+- post('/location/edit/:id'
+~ process the changes made in the dashboard [GP_Owner_dashboard.ejs]
+
+- get('/message/edit/:id'
+~ go to page to edit message in the group [GP_edit_message]
+
+- post('/message/edit/:id'
+~ process the changes to the message from the form [GP_edit_message]
+
+- get('/comment/edit/:id'
+~ go to page to edit comments in the user profile page [US_edit_comment]
+
+- post('/comment/edit/:id'
+~ process the changes to the comments from the form [US_edit_comment]
+
+- post ('/delete_location/:id'
+~ delete a location group with all of its related things (group, messages and members in the location)
