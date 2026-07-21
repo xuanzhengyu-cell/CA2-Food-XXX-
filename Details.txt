@@ -93,6 +93,9 @@ All routes:
 - get('/profile/edit'
 ~ from user own page to edit user own page page [HP_P_edit_user.ejs]
 
+- post('/profile/edit'
+~ process changes done to the user's own profile
+
 
 // Admin Dashboard Routes
 - get('/admin_dashboard'      
@@ -101,8 +104,11 @@ All routes:
 - get('/groups'               
 ~ from admin_dashboard [HP_admin_dashboard.ejs] to all groups list [AD_groups_lists.ejs]
 
-- post ('/delete_location/:id'
+- post('/delete_location/:id'
 ~ delete a location group with all of its related things (group, messages and members in the location)
+
+- get('/users'
+~ go to display all users page
 
 
 // Location Route

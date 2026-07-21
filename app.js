@@ -237,7 +237,7 @@ app.post('/register',validateRegistration, (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.session.destroy(() => {
-        res.redirect('/');
+        res.redirect('/login');
     });
 });
 
@@ -268,29 +268,6 @@ app.get('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
     });
 });
 
-
-
-// =============================================================================================================================
-// Admin Dashboard Routes
-// =============================================================================================================================
-
-app.get('/admin_dashboard', checkAuthenticated, locationIDs_Find, checkAdmin, (req, res) => {
-    res.render('HP_admin_dashboard', {});
-});
-
-// Display all existing location groups- added by cy
-app.get('/groups', (req, res) => {
-    const sql = "SELECT * FROM location";
-    connection.query(sql, (err, results) => {
-        if (err) {
-            throw err;
-        }
-        res.render("AD_groups_lists", {
-            locations: results
-        });
-    });
-})
-
 // post of edit_user (may remove the ability to edit ur role based on future discussion.)
 app.post('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
     const id = req.params.id;
@@ -318,7 +295,30 @@ app.post('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
     });
 });
 
-app.post ('/delete_location/:id', checkAuthenticated, locationIDs_Find, (req, res) => {
+
+
+// =============================================================================================================================
+// Admin Dashboard Routes
+// =============================================================================================================================
+
+app.get('/admin_dashboard', checkAuthenticated, locationIDs_Find, checkAdmin, (req, res) => {
+    res.render('HP_admin_dashboard', {});
+});
+
+// Display all existing location groups
+app.get('/groups', checkAuthenticated, locationIDs_Find, (req, res) => {
+    const sql = "SELECT * FROM location";
+    connection.query(sql, (err, results) => {
+        if (err) {
+            throw err;
+        }
+        res.render("AD_groups_lists", {
+            locations: results
+        });
+    });
+})
+
+app.post('/delete_location/:id', checkAuthenticated, locationIDs_Find, (req, res) => {
     const id = req.params.id;
     const sql1 = `
         UPDATE users 
@@ -346,6 +346,19 @@ app.post ('/delete_location/:id', checkAuthenticated, locationIDs_Find, (req, re
         }
     });
 });
+
+// Display all existing users
+app.get('/users', checkAuthenticated, locationIDs_Find, (req, res) => {
+    const sql = "SELECT * FROM users";
+    connection.query(sql, (err, results) => {
+        if (err) {
+            throw err;
+        }
+        res.render("AD_users_lists", {user: results});
+    });
+})
+
+
 
 
 
