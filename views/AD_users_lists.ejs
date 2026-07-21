@@ -78,8 +78,7 @@
                         </td>
                         
                         <td>
-                            <form action="/admin/deleteUser" method="POST">
-                                <input type="hidden" name="user_id" value="<%= user.user_id %>">
+                            <form action="/admin/deleteUser/<%= user.user_id %>" method="POST">
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this user?')"> Delete </button>
                             </form>
                         </td>
