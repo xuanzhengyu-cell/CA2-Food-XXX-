@@ -8,42 +8,40 @@
     <title>Document</title>
 </head>
 <body>
-    <%- include ('header/header.ejs')%>
-    <h1>Admin Dashboard</h1>
+<%- include ('header/header.ejs')%>
+    <div class="container mt-4">
+        <h1>Admin Dashboard</h1>
+        <br>
+        <div class="card mb-4">
 
-    <div class="card mb-4">
+            <div class="card-header">
+                <h3>Group List</h3>
+            </div>
 
-        <div class="card-header">
-            <h4>Group List</h4>
+            <div class="card-body">
+                <p>View all existing groups.</p>
+
+                <a href="/groups" class="btn btn-primary">
+                    See Group List
+                </a>
+            </div>
         </div>
 
-        <div class="card-body">
-            <p>View all existing groups.</p>
+        <div class="card mb-4">
 
-            <a href="/groups" class="btn btn-primary">
-                See Group List
-            </a>
+            <div class="card-header">
+                <h3>Users List</h3>
+            </div>
+
+            <div class="card-body">
+                <p>View all existing users.</p>
+
+                <a href="/users" class="btn btn-primary">
+                    Edit Members
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="card mb-4">
-
-        <div class="card-header">
-            <h4>Users List</h4>
-        </div>
-
-        <div class="card-body">
-            <p>View all existing users.</p>
-
-            <a href="/users" class="btn btn-primary">
-                Edit Members
-            </a>
-        </div>
-    </div>
-
-   
-
-            
-    
 </body>
 </html>    
