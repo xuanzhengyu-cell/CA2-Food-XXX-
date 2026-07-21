@@ -36,49 +36,8 @@
                         placeholder="Leave blank if you don't want to change it">
                 </div>
 
-                <!-- user role(maybe not doing this.) -->
-                <% if (currentUser.role==="admin" || currentUser.role==="group_owner" ) { %>
-                    <div class="mb-3">
-                        <label>Role</label>
-                        <select name="role" class="form-select">
-
-                            <% if (currentUser.role==="admin" ) { %>
-
-                                <option value="admin" <%=user.role==="admin" ? "selected" : "" %>>
-                                    Admin
-                                </option>
-
-                                <option value="normal_user" <%=user.role==="normal_user" ? "selected" : "" %>>
-                                    Normal User
-                                </option>
-
-                                <option value="group_owner" <%=user.role==="group_owner" ? "selected" : "" %>>
-                                    Group Owner
-                                </option>
-
-                                <option value="group_member" <%=user.role==="group_member" ? "selected" : "" %>>
-                                    Group Member
-                                </option>
-
-                                <% } else { %>
-
-                                    <option value="group_owner" <%=user.role==="group_owner" ? "selected" : "" %>>
-                                        Group Owner
-                                    </option>
-
-                                    <option value="group_member" <%=user.role==="group_member" ? "selected" : "" %>>
-                                        Group Member
-                                    </option>
-
-                                    <% } %>
-
-                        </select>
-
-                    </div>
 
                     <% } %>
-
-
 
                         <button type="submit" class="btn btn-success">
                             Save Changes

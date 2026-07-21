@@ -547,6 +547,50 @@ app.post('/message/edit/:id', checkAuthenticated, (req, res) => {
 });
 
 
+//edit for comments get route
+app.get('/comment/edit/:id', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
+
+    const id = req.params.id;
+    const sql = "SELECT * FROM comments WHERE comments_id = ?";
+
+    connection.query(sql, [id], (err, results) => {
+        if (err) throw err;
+        if (results.length === 0) {
+            req.flash('error', 'Comment not found.');
+            return res.redirect('/');
+        }
+
+        res.render('edit_comment', {
+            comment: results[0],
+            logged_in
+        });
+    });
+});
+
+
+//edit for comment post route
+app.post('/comment/edit/:id', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
+
+    const id = req.params.id;
+    const { comments_text } = req.body;
+    const sql = `
+        UPDATE comments
+        SET comments_text = ?
+        WHERE comments_id = ?
+    `;
+
+    connection.query(sql, [comments_text, id], (err) => {
+        if (err) throw err;
+        req.flash('success', 'Comment updated successfully.');
+        res.redirect('/');
+
+    });
+});
+
+// Edit Members page- cy
+app.get('/edit_members', checkAuthenticated, checkAdmin, (req, res) => {
+    res.render('edit_members');
+});
 
 
 // =============================================================================================================================

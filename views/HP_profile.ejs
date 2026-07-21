@@ -10,17 +10,57 @@
 <body>
     <%- include ('header/header.ejs')%>
 
-    <div class="container mt-4">
+        <div class="container mt-4">
+            <!-- User Name -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h2>
+                        <%= user.username %>
+                    </h2>
+                </div>
+            </div>
 
-        <!-- edit button wzy -->
-        <a href="/user/edit" class="btn btn-warning">
-            Edit Profile
-        </a>
+            <!-- User Details -->
+            <div class="card mb-4">
+                <div class="card-body">
+
+                    <h4>Profile Information</h4>
+
+                    <p><strong>User ID:</strong>
+                        <%= user.user_id %>
+                    </p>
+
+                    <p><strong>Role:</strong>
+                        <%= user.role %>
+                    </p>
+
+                    <% if(user.role==="admin" ){ %>
+
+                        <p><strong>Status:</strong> Administrator</p>
+
+                        <% } else { %>
+
+                            <p><strong>Status:</strong> Normal User</p>
+
+                            <% } %>
+
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="mb-3">
+                <!-- edit button wzy -->
+                <a href="/user/edit/<%= user.user_id %>" class="btn btn-warning">
+                    Edit Profile
+                </a>
+
+                <!-- delete account idk whose is it write here. -->
 
 
-        <a href="/logout">
-            <button type="submit" class="btn btn-light border-black border-2">Log Out</button>
-        </a>
-    </div>
+                <a href="/logout">
+                    <button type="submit" class="btn btn-light border-black border-2">Log Out</button>
+                </a>
+            </div>
+        </div>
 </body>
 </html>
