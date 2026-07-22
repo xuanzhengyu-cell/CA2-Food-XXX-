@@ -634,15 +634,22 @@ app.get('/location_members/:id', checkAuthenticated, locationIDs_Find, (req, res
             throw err;
         } else {
         let location_name = results_l[0].location_name; 
-        const sql = 'SELECT users.users_id, users.username FROM users_has_location INNER JOIN users ON users_has_location.user_id = users.users_id WHERE location_id = ?';
+        const sql = `
+            SELECT users.users_id, users.username, users_has_location.role
+            FROM users_has_location 
+            INNER JOIN users ON users_has_location.user_id = users.users_id 
+            WHERE location_id = ?`;
         connection.query(sql, [id], (err, results_m) => {
             if (err) {
-                throw err;
+                console.log (err)
+            } else if (results_l.length === 0) {
+                console.log ("Not available")
+                res.redirect(`/location/${location_id}`)
             } else {
-                let messages = results_m
+                let users = results_m
                 const location_id = id
                 res.render('GP_Group_Members', 
-                    {location_id, location_name, messages});
+                    {location_id, location_name, users});
             }
         });
         }
