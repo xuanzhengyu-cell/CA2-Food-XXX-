@@ -537,14 +537,14 @@ app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwn
     res.render('GP_message_create', {});
 });
 
-app.post('/location/:id/message', (req,res) => {
+app.post('/location/:id/message', checkAuthenticated, checkGOwnerAdminandMember, (req,res) => {
     const location_id = parseInt(req.params.id);
     const sender_id = req.session.user.user_id
     const {title, content} = req.body 
     const sql = `
         INSERT INTO comments (location_id, sender_id, title, text)
         VALUES (?, ?, ?, ?)`
-    connection.query(sql, [location_id, sender_id, content], (err) => {
+    connection.query(sql, [location_id, sender_id, title, content], (err) => {
         if (err) {
             console.log (err);
         } else {
@@ -553,8 +553,9 @@ app.post('/location/:id/message', (req,res) => {
     })
 })
 
-app.get('/location/:id/message/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
-    const {location_id, message_id} = parseInt(req.params);
+app.get('/location/:location_id/message/edit/:message_id', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
+    const message_id = parseInt(req.params.message_id); 
+    const location_id = parseInt(req.params.location_id); 
     const sql = `
         SELECT * 
         FROM messages 
@@ -569,8 +570,9 @@ app.get('/location/:id/message/edit/:id', checkAuthenticated, locationIDs_Find, 
     })
 })
 
-app.post('/location/:id/message/edit/:id', (req, res) => {
-    const {location_id, message_id} = parseInt(req.params); 
+app.post('/location/:location_id/message/edit/:message_id', checkAuthenticated, checkGOwnerAdminandMember, (req, res) => {
+    const message_id = parseInt(req.params.message_id); 
+    const location_id = parseInt(req.params.location_id); 
     const {title, content} = req.body
     const sql = `
         UPDATE messages 
@@ -585,8 +587,9 @@ app.post('/location/:id/message/edit/:id', (req, res) => {
     })
 })
 
-app.post('/location/:id/message/delete/:id', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
-    const {location_id, message_id} = parseInt(req.params);
+app.post('/location/:location_id/message/delete/:message_id', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
+    const message_id = parseInt(req.params.message_id); 
+    const location_id = parseInt(req.params.location_id); 
     const sql = `
         DELETE FROM messages
         WHERE location_id = ? AND message_id = ?`
@@ -606,7 +609,7 @@ app.post('/location/:id/message/delete/:id', checkAuthenticated, locationIDs_Fin
 // =============================================================================================================================
 
 // Get list of group members (display + click user to go to their page ONLY)
-app.get('/location_members/:id', locationIDs_Find, (req, res) => {
+app.get('/location_members/:id', checkAuthenticated, locationIDs_Find, (req, res) => {
     const id = parseInt(req.params.id);
 
     const sql = 'SELECT * FROM location WHERE location_id = ?';
@@ -630,9 +633,19 @@ app.get('/location_members/:id', locationIDs_Find, (req, res) => {
     });
 });
 
-app.get('/user/:id', locationIDs_Find, (req, res) => {
-    const id = parseInt(req.params.id);
-    
+app.post ('/request/location/:id', checkAuthenticated, (req, res) => {
+    const location_id = parseInt(req.params.id);
+    const user_id = req.session.user.user_id
+    const sql = `
+        INSERT INTO users_has_location (user_id, location_id)
+        VALUES (?, ?)`
+    connection.query (sql, [user_id, location_id], (err) =>{
+        if (err) {
+            console.log (err)
+        } else {
+            res.redirect (`/location_members/${location_id}`)
+        }
+    })
 })
 
 
@@ -664,8 +677,6 @@ app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnera
             connection.query(sql, [id], (err, results) => {
                 if (err) {
                     console.error('Failed:', err.message);
-                    req.flash('error', 'Cannot delete this location because it is linked to other items.');
-                    return res.redirect('/groups');
                 } else {
                     const users = results
                     res.render('GP_Owner_dashboard', {location, users});
@@ -679,19 +690,17 @@ app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnera
 app.post('/location/edit/:id', checkAuthenticated, locationIDs_Find, (req, res) => {
 
     const id = req.params.id;
-    const { location_name } = req.body;
+    const { location_name, image } = req.body;
     const sql = `
         UPDATE location
-        SET location_name = ?
+        SET location_name = ?, Images = ?
         WHERE location_id = ?
     `;
 
-    connection.query(sql, [location_name, id], (err) => {
+    connection.query(sql, [location_name, image, id], (err) => {
         if (err) throw err;
-
         req.flash('success', 'Location updated successfully.');
-        res.redirect('/');
-
+        res.redirect(`/location/edit/${id}`);
     });
 });
 
