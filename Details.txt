@@ -120,18 +120,23 @@ All routes:
 - get('/location/:id/message' 
 ~ from group location [GP_location.ejs] to message creation [GP_message_create.ejs]
 
+- post('/location/:id/message' 
+~ process the message creation from the form 
+
+- get('/location/:id/message/edit/:id'
+~ go to page to edit message in the group [GP_edit_message]
+
+- post('/location/:id/message/edit/:id'
+~ process the changes to the message from the form [GP_edit_message]
+
+- post('/location/:id/message/delete/:id'
+~ delete a message at a location 
 
 // Location (Members) Routes
 - get('/location_members/:id'
 ~ from location group page [GP_location.ejs] to members list page [GP_Group_Members.ejs]
 
-- get('/message/edit/:id'
-~ go to page to edit message in the group [GP_edit_message]
-
-- post('/message/edit/:id'
-~ process the changes to the message from the form [GP_edit_message]
-
-
+` 
 // Location (Dashboard) Routes
 - get('/location/edit/:id'
 ~ from location group page [GP_location.ejs] to group owner dashboard [GP_Owner_dashboard.ejs]

@@ -14,36 +14,18 @@
 <div class="container mt-4">
 
     <h2>Edit Message</h2>
-    <form action="/message/edit/<%= message.messages_id %>" method="POST">
-
-        <!-- message ID -->
-        <div class="mb-3">
-            <label>Message ID</label>
-            <input
-                type="text"
-                class="form-control"
-                value="<%= message.messages_id %>"
-                readonly>
-        </div>
-
-        <!-- location ID -->
-        <div class="mb-3">
-            <label>Location ID</label>
-            <input
-                type="text"
-                class="form-control"
-                value="<%= message.location_id %>"
-                readonly>
-        </div>
+    <form action="/location/<%= location.location_id %>/message/edit/<%= message.messages_id %>" method="POST">
 
         <!-- sender ID -->
         <div class="mb-3">
-            <label>Sender ID</label>
+            <label>Message Title:</label>
             <input
                 type="text"
+                id="title"
+                name="title"
                 class="form-control"
-                value="<%= message.sender_id %>"
-                readonly>
+                value="<%= message.title %>"
+                required>
         </div>
 
         <!-- message -->
@@ -51,6 +33,8 @@
             <label>Message</label>
             <textarea
                 name="text"
+                id="content"
+                name="content"
                 class="form-control"
                 rows="5"
                 required><%= message.text %></textarea>

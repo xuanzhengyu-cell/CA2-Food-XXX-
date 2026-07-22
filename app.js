@@ -534,54 +534,70 @@ app.get('/location/:id', locationIDs_Find, (req, res) => {
 
 app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
     const location_id = parseInt(req.params.id);
-    res.render('GP_message_create', 
-        {});
+    res.render('GP_message_create', {});
 });
 
-//edit message (get)
-app.get('/message/edit/:id', checkAuthenticated, locationIDs_Find, (req, res) => {
-
-    const id = req.params.id;
-    const sql = "SELECT * FROM messages WHERE messages_id = ?";
-
-    connection.query(sql, [id], (err, results) => {
-
-        if (err) throw err;
-
-        if (results.length === 0) {
-            req.flash('error', 'Message not found.');
-            return res.redirect('/');
-        }
-
-        res.render('GP_edit_message', {
-            message: results[0],
-            logged_in
-        });
-    });
-});
-
-//edit for message (Post)
-app.post('/message/edit/:id', checkAuthenticated,locationIDs_Find, (req, res) => {
-    const id = req.params.id;
-    const { text } = req.body;
+app.post('/location/:id/message', (req,res) => {
+    const location_id = parseInt(req.params.id);
+    const sender_id = req.session.user.user_id
+    const {title, content} = req.body 
     const sql = `
-        UPDATE messages
-        SET
-            text = ?,
-            date = CURDATE(),
-            likes = 0
-        WHERE messages_id = ?
-    `;
+        INSERT INTO comments (location_id, sender_id, title, text)
+        VALUES (?, ?, ?, ?)`
+    connection.query(sql, [location_id, sender_id, content], (err) => {
+        if (err) {
+            console.log (err);
+        } else {
+            res.redirect (`/location/${location_id}`)
+        }
+    })
+})
 
-    connection.query(sql, [text, id], (err) => {
+app.get('/location/:id/message/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
+    const {location_id, message_id} = parseInt(req.params);
+    const sql = `
+        SELECT * 
+        FROM messages 
+        WHERE location_id = ? AND messages_id = ?`;
+    connection.query (sql, [location_id, message_id], (err, results) =>{
+        if (err) {
+            console.log(err);
+        } else {
+            const message = results [0]
+            res.render ('GP_edit_message', {message})
+        }
+    })
+})
 
-        if (err) throw err;
+app.post('/location/:id/message/edit/:id', (req, res) => {
+    const {location_id, message_id} = parseInt(req.params); 
+    const {title, content} = req.body
+    const sql = `
+        UPDATE messages 
+        SET title = ?, text = ?
+        WHERE location_id = ? AND message_id = ?`
+    connection.query(sql, [title, content, location_id, message_id], (err) =>{
+        if (err) {
+            console.log (err) 
+        } else {
+            res.redirect (`/location/${location_id}`)
+        }
+    })
+})
 
-        req.flash('success', 'Message updated successfully.');
-        res.redirect('/');
-
-    });
-});
+app.post('/location/:id/message/delete/:id', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
+    const {location_id, message_id} = parseInt(req.params);
+    const sql = `
+        DELETE FROM messages
+        WHERE location_id = ? AND message_id = ?`
+    connection.query(sql, [location_id, message_id], (err) =>{
+        if (err) {
+            console.log(err)
+        } else {
+            res.redirect (`/location/${location_id}`)
+        }
+    })
+})
 
 
 
@@ -613,6 +629,11 @@ app.get('/location_members/:id', locationIDs_Find, (req, res) => {
         }
     });
 });
+
+app.get('/user/:id', locationIDs_Find, (req, res) => {
+    const id = parseInt(req.params.id);
+    
+})
 
 
 
