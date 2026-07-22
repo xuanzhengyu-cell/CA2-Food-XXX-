@@ -107,11 +107,19 @@ const checkGOwnerandAdmin = (req, res, next) => {
     if (req.session.user.role === 'admin') {
         return next();
     }
-    if (req.session.user.role === "group_owner" && String(req.session.user.location_id) === String(id)) {
-        return next();
-    }
-    req.flash('error', 'Access denied');
-    res.redirect('/');
+    const sql = `SELECT role FROM users_has_location WHERE user_id = ?`
+    connection.query (sql, [req.session.user.user_id], (err, results) => {
+        if (err) {
+            console.log (err)
+        } else {
+            const role = results [0]
+            if (role === "group_owner" && String(req.session.user.location_id) === String(id)) {
+                return next();
+            }
+            req.flash('error', 'Access denied');
+            res.redirect('/');
+        }
+    })
 };
 
         // Check Group Owner + Member + admin (For sending messages in the location groups)
@@ -120,14 +128,22 @@ const checkGOwnerAdminandMember = (req, res, next) => {
     if (req.session.user.role === 'admin') {
         return next();
     }
-    if (req.session.user.role === "group_owner" && String(req.session.user.location_id) === String(id)) {
-        return next();
-    }
-    if (req.session.user.role === "group_member" && String(req.session.user.location_id) === String(id)) {
-        return next();
-    }
-    req.flash('error', 'Access denied');
-    res.redirect('/');
+    const sql = `SELECT role FROM users_has_location WHERE user_id = ?`
+    connection.query (sql, [req.session.user.user_id], (err, results) => {
+        if (err) {
+            console.log (err)
+        } else {
+            const role = results [0]
+            if (role === "group_owner" && String(req.session.user.location_id) === String(id)) {
+                return next();
+            }
+            if (role === "group_member" && String(req.session.user.location_id) === String(id)) {
+                return next();
+            }
+            req.flash('error', 'Access denied');
+            res.redirect('/');
+        }
+    })
 };
 
         // validate that the items entered are viable
@@ -637,8 +653,8 @@ app.post ('/request/location/:id', checkAuthenticated, (req, res) => {
     const location_id = parseInt(req.params.id);
     const user_id = req.session.user.user_id
     const sql = `
-        INSERT INTO users_has_location (user_id, location_id)
-        VALUES (?, ?)`
+        INSERT INTO users_has_location (user_id, location_id, role)
+        VALUES (?, ?, "normal_user")`
     connection.query (sql, [user_id, location_id], (err) =>{
         if (err) {
             console.log (err)
@@ -670,7 +686,7 @@ app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnera
         } else {
             const location = results[0]
             const sql = `
-                SELECT users.user_id, users.username 
+                SELECT users.user_id, users.username, users_has_location.role
                 FROM users 
                 LEFT JOIN users_has_location ON users_has_location.user_id = users.user_id
                 WHERE users_has_location.location_id = ?`
@@ -687,8 +703,7 @@ app.get('/location/edit/:id', checkAuthenticated, locationIDs_Find, checkGOwnera
 });
 
 // edit for location (post)
-app.post('/location/edit/:id', checkAuthenticated, locationIDs_Find, (req, res) => {
-
+app.post('/location/edit/:id', checkAuthenticated, checkGOwnerandAdmin, (req, res) => {
     const id = req.params.id;
     const { location_name, image } = req.body;
     const sql = `
@@ -703,6 +718,38 @@ app.post('/location/edit/:id', checkAuthenticated, locationIDs_Find, (req, res) 
         res.redirect(`/location/edit/${id}`);
     });
 });
+
+app.post('/location/edit/:location_id/changeRole/:user_id', checkAuthenticated, checkGOwnerandAdmin, (req, res) => {
+    const user_id = parseInt(req.params.user_id); 
+    const location_id = parseInt(req.params.location_id); 
+    const {role} = req.body
+    const sql = `
+        UPDATE users_has_location 
+        SET role = ?
+        WHERE user_id = ?, location_id = ?` 
+    connection.query (sql, [role, user_id, location_id], (err) => {
+        if (err) {
+            console.log (err)
+        } else {
+            res.redirect (`/location/edit/${location_id}`)
+        }
+    }) 
+})
+
+app.post('/location/edit/:location_id/deleteUser/:user_id', checkAuthenticated, checkGOwnerandAdmin, (req, res) => {
+    const user_id = parseInt(req.params.user_id); 
+    const location_id = parseInt(req.params.location_id); 
+    const sql = `
+        DELETE FROM users_has_location 
+        WHERE user_id = ? AND location_id = ?` 
+    connection.query (sql, [user_id, location_id], (err) => {
+        if (err) {
+            console.log (err)
+        } else {
+            res.redirect (`/location/edit/${location_id}`)
+        }
+    }) 
+})
 
 
 

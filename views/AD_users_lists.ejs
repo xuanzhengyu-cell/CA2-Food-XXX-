@@ -46,10 +46,6 @@
                         <td>
                             <% if (user.role === "admin") { %>
                                 <h5>Admin</h5>
-                            <% } else if (user.role === "group_owner") {%>
-                                <h5>Group Owner</h5>
-                            <% } else if (user.role === "group_member") {%>
-                                <h5>Group Member</h5>
                             <% } else if (user.role === "normal_user") {%>
                                 <h5>Normal User</h5>
                             <% } %>
@@ -60,12 +56,6 @@
                             <select name="role" class="form-select">
                                 <option value="admin" <%= users.role==="admin" ?"selected ":"" %>>
                                     Admin
-                                </option>
-                                <option value="group_owner" <%= user.role==="group_owner" ?"selected ":"" %> disabled>
-                                    Group Owner
-                                </option>
-                                <option value="group_member" <%= user.role==="group_member" ?"selected ":"" %> disabled>
-                                    Group Member
                                 </option>
                                 <option value="normal_user" <%= user.role==="normal_user" ?"selected ":"" %>>
                                     Normal User
