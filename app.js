@@ -897,13 +897,6 @@ app.post('/comment/edit/:id', checkAuthenticated, checkGOwnerAdminandMember, loc
     });
 });
 
-// Edit Members page- cy
-app.get('/edit_members', checkAuthenticated, checkAdmin, (req, res) => {
-    res.render('edit_members');
-});
-
-
-
 
 const PORT = process.env.PORT || 3000; 
 app.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`)); 
