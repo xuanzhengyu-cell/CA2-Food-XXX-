@@ -336,7 +336,7 @@ app.post('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
         };
         req.session.user.username = username;
         req.session.user.role = role;// may remove this based on future discussion.
-        req.flash('success', 'Profile updated successfully.');
+        req.flash('success', 'Profile updated successfully.'); 
         res.redirect('/profile');
     });
 });
