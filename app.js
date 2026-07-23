@@ -576,7 +576,9 @@ app.get('/location/:id', locationIDs_Find, (req, res) => {
 
 app.get('/location/:id/message', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
     const location_id = parseInt(req.params.id);
-    res.render('GP_message_create', {});
+    res.render('GP_message_create', {
+     location_id: location_id
+    });
 });
 
 app.post('/location/:id/message', checkAuthenticated, checkGOwnerAdminandMember, (req,res) => {
