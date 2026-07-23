@@ -14,43 +14,15 @@
 <div class="container mt-4">
     <h2>Edit Comment</h2>
 
-    <form action="/comment/edit/<%= comment.comments_id %>" method="POST">
-
-        <div class="mb-3">
-            <label>Comment ID</label>
-            <input
-                type="text"
-                class="form-control"
-                value="<%= comment.comments_id %>"
-                readonly>
-        </div>
-
-        <div class="mb-3">
-            <label>Sender ID</label>
-            <input
-                type="text"
-                class="form-control"
-                value="<%= comment.sender_id %>"
-                readonly>
-        </div>
-
-        <div class="mb-3">
-            <label>Owner ID</label>
-            <input
-                type="text"
-                class="form-control"
-                value="<%= comment.owner_id %>"
-                readonly>
-        </div>
-
-      
+    <form action="/user/<%= comments.owner_id %>/comment/edit/<%= comments.comments_id %>" method="POST">
+ 
         <div class="mb-3">
             <label>Comment</label>
             <textarea
                 name="comments_text"
                 class="form-control"
                 rows="5"
-                required><%= comment.comments_text %></textarea>
+                required><%= comments.comments_text %></textarea>
         </div>
 
         <button type="submit" class="btn btn-success">

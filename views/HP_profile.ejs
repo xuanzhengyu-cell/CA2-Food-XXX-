@@ -48,7 +48,7 @@
             </div>
 
             <!-- Buttons -->
-            <div class="mb-3">
+            <div class="container mb-3">
                 <!-- edit button wzy -->
                 <a href="/profile/edit" class="btn btn-warning">
                     Edit Profile
@@ -62,12 +62,12 @@
                 </a>
             </div>
         </div>
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <h4>Comments</h4>
-                <% if (comments.length===0) { %>
-                    <p>No comments.</p>
+        <div class="container mb-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4>Comments</h4>
+                    <% if (comments.length===0) { %>
+                        <p>No comments.</p>
 
                     <% } else { %>
                         <% comments.forEach(comment=> { %>
@@ -78,6 +78,7 @@
                             </div>
                         <% }) %>
                     <% } %>
+                </div>
             </div>
         </div>
 </body>

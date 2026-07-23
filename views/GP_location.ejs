@@ -27,14 +27,11 @@
             <div class="border rounded p-3 mb-3">
                 <h5><%= message.title %></h5>
                 <p><%= message.text %></p>
-
-                <br><br>
-
+                <br>
                 <a href="/location/<%= message.location_id %>/message/edit/<%= message.messages_id %>"
                    class="btn btn-warning btn-sm">
                     Edit
                 </a>
-
                 <form action="/location/<%= location_id %>/message/delete/<%= message.messages_id %>"
                       method="POST"
                       class="d-inline">
@@ -42,7 +39,6 @@
                     <button class="btn btn-danger btn-sm">
                         Delete
                     </button>
-
                 </form>
             </div>
         <% }) %>
