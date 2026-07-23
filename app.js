@@ -277,9 +277,24 @@ app.get('/logout', (req, res) => {
 // Profile Routes
 // =============================================================================================================================
 
-app.get('/profile', locationIDs_Find, (req, res) => {
-    req.
-    res.render('HP_profile', {});
+app.get('/profile', checkAuthenticated, locationIDs_Find, (req, res) => {
+    const id = req.session.user.user_id;
+
+    const userSql = "SELECT * FROM users WHERE user_id = ?";
+    const commentSql = "SELECT comments_text FROM comments";
+
+    connection.query(userSql, [id], (err, userResult) => {
+        if (err) throw err;
+
+        connection.query(commentSql, (err, commentResult) => {
+            if (err) throw err;
+
+            res.render('HP_profile', {
+                user: userResult[0],
+                comments: commentResult
+            });
+        });
+    });
 });
 
 // Edit of profile
