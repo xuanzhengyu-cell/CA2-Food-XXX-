@@ -25,6 +25,7 @@ const connection = mysql.createConnection({
          rejectUnauthorized: false
     }   
 }); 
+
 connection.connect((err) => { 
     if (err) { 
         console.error('Error connecting to MySQL:', err); 
@@ -60,13 +61,13 @@ const locationIDs_Find = (req, res, next) => {
     res.locals.location_ids = []; 
     res.locals.user = req.session.user || null;
 
-if (req.session.user) {
+    if (req.session.user) {
         const user_id = req.session.user.user_id;
         const sql = `SELECT location.location_id, location.location_name 
-                     FROM location 
-                     INNER JOIN users_has_location 
-                     ON location.location_id = users_has_location.location_id 
-                     WHERE user_id = ?`;            
+                        FROM location 
+                        INNER JOIN users_has_location 
+                        ON location.location_id = users_has_location.location_id 
+                        WHERE user_id = ?`;            
         connection.query(sql, [user_id], (err, results) => {
             if (err) {
                 throw err;
@@ -77,10 +78,10 @@ if (req.session.user) {
                 return next();
             }
             })
-    } else {
-        next();
-    }
-};
+        } else {
+            next();
+        }
+    };
 
 const checkAuthenticated = (req, res, next) => {
     if (req.session.user) {
