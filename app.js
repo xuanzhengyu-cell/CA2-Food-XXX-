@@ -176,7 +176,11 @@ app.post('/login', (req, res) => {
         return res.redirect('/login');
     }
 
-    const sql = 'SELECT * FROM users WHERE username = ? AND password = SHA2(?, 256)';
+    const sql = `
+        SELECT users.user_id, users.role
+        FROM users 
+        INNER JOIN users_has_location ON users_has_location.user_id = users.user_id 
+        WHERE users.username = ? AND users.password = SHA2(?, 256)`;
     connection.query(sql, [username, password], (err, results) => {
         if (err) {
             throw err;
@@ -378,7 +382,7 @@ app.post('/create_location', (req, res) => {
             const location_id = results.location_id
             const role = "group_owner"
             const sql = `
-                INSERT INTO users_has_location (location_id, user_id, role)
+                INSERT INTO users_has_location (location_id, user_id, group_role)
                 VALUES (?, ?, ?)`
             connection.query (sql, [location_id, username, role], (err) => {
                 if (err) {
@@ -544,16 +548,16 @@ const checkGOwnerAdminandMember = (req, res, next) => {
     if (req.session.user.role === 'admin') {
         return next();
     }
-    const sql = `SELECT role FROM users_has_location WHERE user_id = ?`
+    const sql = `SELECT group_role FROM users_has_location WHERE user_id = ?`
     connection.query (sql, [req.session.user.user_id], (err, results) => {
         if (err) {
             console.log (err)
         } else {
-            const role = results [0]
-            if (role === "group_owner" && String(req.session.user.location_id) === String(location_id)) {
+            const group_role = results [0]
+            if (group_role === "group_owner" && String(req.session.user.location_id) === String(location_id)) {
                 return next();
             }
-            if (role === "group_member" && String(req.session.user.location_id) === String(location_id)) {
+            if (group_role === "group_member" && String(req.session.user.location_id) === String(location_id)) {
                 return next();
             }
             req.flash('error', 'Access denied');
@@ -649,7 +653,7 @@ app.get('/location_members/:id', checkAuthenticated, locationIDs_Find, (req, res
         } else {
         let location_name = results_l[0].location_name; 
         const sql = `
-            SELECT users.user_id, users.username, users_has_location.role
+            SELECT users.user_id, users.username, users_has_location.group_role
             FROM users_has_location 
             INNER JOIN users ON users_has_location.user_id = users.user_id 
             WHERE location_id = ?`;
@@ -670,7 +674,7 @@ app.post ('/request/location/:id', checkAuthenticated, (req, res) => {
     const location_id = parseInt(req.params.id);
     const user_id = req.session.user.user_id
     const sql = `
-        INSERT INTO users_has_location (user_id, location_id, role)
+        INSERT INTO users_has_location (user_id, location_id, group_role)
         VALUES (?, ?, "normal_user")`
     connection.query (sql, [user_id, location_id], (err) =>{
         if (err) {
@@ -693,13 +697,13 @@ const checkGOwnerandAdmin = (req, res, next) => {
     if (req.session.user.role === 'admin') {
         return next();
     }
-    const sql = `SELECT role FROM users_has_location WHERE user_id = ?`
+    const sql = `SELECT group_role FROM users_has_location WHERE user_id = ?`
     connection.query (sql, [req.session.user.user_id], (err, results) => {
         if (err) {
             console.log (err)
         } else {
-            const role = results [0]
-            if (role === "group_owner" && String(req.session.user.location_id) === String(location_id)) {
+            const group_role = results [0]
+            if (group_role === "group_owner" && String(req.session.user.location_id) === String(location_id)) {
                 return next();
             }
             req.flash('error', 'Access denied');
@@ -724,7 +728,7 @@ app.get('/location/edit/:location_id', checkAuthenticated, locationIDs_Find, che
         } else {
             const location = results[0]
             const sql = `
-                SELECT users.user_id, users.username, users_has_location.role
+                SELECT users.user_id, users.username, users_has_location.group_role
                 FROM users 
                 LEFT JOIN users_has_location ON users_has_location.user_id = users.user_id
                 WHERE users_has_location.location_id = ?`
@@ -763,7 +767,7 @@ app.post('/location/edit/:location_id/changeRole/:user_id', checkAuthenticated, 
     const {role} = req.body
     const sql = `
         UPDATE users_has_location 
-        SET role = ?
+        SET group_role = ?
         WHERE user_id = ?, location_id = ?` 
     connection.query (sql, [role, user_id, location_id], (err) => {
         if (err) {
@@ -812,7 +816,7 @@ app.get('/user/:id', locationIDs_Find, (req, res) => {
             } else {
                 let comments = results_m
                 const sql3 = `
-                    SELECT users_has_location.location_id, users_has_location.role, location.location_name
+                    SELECT users_has_location.location_id, users_has_location.group_role, location.location_name
                     FROM users_has_location
                     INNER JOIN location ON users_has_location.location_id = location.location_id
                     WHERE users_has_location.user_id = ?`
