@@ -595,7 +595,7 @@ app.post('/location/:id/message', checkAuthenticated, checkGOwnerAdminandMember,
     const sender_id = req.session.user.user_id
     const {title, content} = req.body 
     const sql = `
-        INSERT INTO comments (location_id, sender_id, title, text)
+        INSERT INTO messages (location_id, sender_id, title, text)
         VALUES (?, ?, ?, ?)`
     connection.query(sql, [location_id, sender_id, title, content], (err) => {
         if (err) {
