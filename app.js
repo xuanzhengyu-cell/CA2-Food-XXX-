@@ -398,8 +398,18 @@ app.get('/groups', checkAuthenticated, locationIDs_Find, (req, res) => {
         if (err) {
             console.error('Failed:', err.message);
         }
-        res.render("AD_groups_lists", {locations: results});
+        const locations = results
+        const sql = `SELECT user_id, username, role FROM users`
+        connection.query(sql, [], (err, results) => {
+            if (err) {
+                console.log(err)
+            } else {
+                const users = results 
+                res.render("AD_groups_lists", {locations, users});
+            }
+        })
     });
+    
 })
 
 app.post('/create_location', (req, res) => {
