@@ -382,21 +382,40 @@ app.get('/groups', checkAuthenticated, locationIDs_Find, (req, res) => {
         if (err) {
             console.error('Failed:', err.message);
         }
-        res.render("AD_groups_lists", {locations: results});
+        const locations = results
+        const sql = "SELECT user_id, username, role FROM users";
+        connection.query(sql, (err, results) => {
+            if (err) {
+                console.error('Failed:', err.message);
+            }
+                const users = results 
+                res.render("AD_groups_lists", {locations, users});
+        })
     });
 })
 
 app.post('/create_location', (req, res) => {
-    const {location_name, image} = req.body
+    const {location_name, image, username} = req.body
 
     const sql = `
         INSERT INTO location (location_name, Images)
-        VALUES (?, ?)`
-    connection.query(sql, [location_name, image], (err) => {
+        VALUES (?, ?);`
+    connection.query(sql, [location_name, image, location_name], (err, results) => {
         if (err) {
             console.error('Failed:', err.message);
         } else {
-            res.redirect("/groups")
+            const location_id = results.location_id
+            const role = "group_owner"
+            const sql = `
+                INSERT INTO users_has_location (location_id, user_id, role)
+                VALUES (?, ?, ?);`
+            connection.query (sql, [location_id, username, role], (err) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    res.redirect("/groups", {})
+                }
+            })
         }
     })
 })

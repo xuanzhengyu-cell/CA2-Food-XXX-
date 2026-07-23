@@ -17,6 +17,21 @@
             <input type="text" id="location_name" name="location_name" class="form-control" placeholder="Name of New Location" required>
             <br>
             <input class="form-control" type="file" id="image" name="image" accept="image/*" >
+            <br>
+            <select name="username" class="form-select">
+            <% users.forEach(users => { %>
+                <% if (users.role == "admin") { %>
+                    <option value="<%= users.user_id %>" disabled>
+                        <%= users.username %>
+                    </option>
+                <% } else {%>
+                    <option value="<%= users.user_id %>" >
+                        <%= users.username %>
+                    </option>
+                <% } %>
+            <% }) %>
+            </select>
+
             <button type="submit" class="btn btn-success btn-sm mt-2">Create New Location Group</button>
         </form>
     </div>
