@@ -12,6 +12,44 @@
     <h1><%= location_name %></h1>
 
     <a href="/location/edit/<%= location_id %>" class="btn btn-warning">Group Owner Dashboard</a>
-    <a href="/location_members/<%= location_id %>" class="btn btn-warning">Stalls at that Location</a>
+    <a href="/location/members/<%= location_id %>" class="btn btn-warning">Stalls at that Location</a>
+    <a href="/location/<%= location_id %>/message" class="btn btn-success"> Add Message </a>
+
+    <div class="card">
+        <div class="card-body">
+
+        <% if(messages.length === 0){ %>
+            <p>No messages yet.</p>
+        <% } %>
+
+        <% messages.forEach(message => { %>
+
+            <div class="border rounded p-3 mb-3">
+                <h5><%= message.title %></h5>
+                <p><%= message.text %></p>
+
+                <br><br>
+
+                <a href="/location/<%= location_id %>/message/edit/<%= message.message_id %>"
+                   class="btn btn-warning btn-sm">
+                    Edit
+                </a>
+
+                <form action="/location/<%= location_id %>/message/delete/<%= message.message_id %>"
+                      method="POST"
+                      class="d-inline">
+
+                    <button class="btn btn-danger btn-sm">
+                        Delete
+                    </button>
+
+                </form>
+            </div>
+        <% }) %>
+
+
+
+        </div>
+    </div>
 </body>
 </html>

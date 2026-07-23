@@ -181,7 +181,7 @@ app.get('/', locationIDs_Find, (req, res) => {
     const values = [];
 
     if (search) {
-        sql += ' AND location_name LIKE ?';
+        sql1 += ' AND location_name LIKE ?';
         values.push('%' + search + '%');
     }
 
