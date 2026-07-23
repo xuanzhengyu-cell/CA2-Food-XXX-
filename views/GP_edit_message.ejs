@@ -14,7 +14,7 @@
 <div class="container mt-4">
 
     <h2>Edit Message</h2>
-    <form action="/location/<%= location.location_id %>/message/edit/<%= message.messages_id %>" method="POST">
+    <form action="/location/<%= message.location_id %>/message/edit/<%= message.messages_id %>" method="POST">
 
         <!-- sender ID -->
         <div class="mb-3">
@@ -32,7 +32,6 @@
         <div class="mb-3">
             <label>Message</label>
             <textarea
-                name="text"
                 id="content"
                 name="content"
                 class="form-control"
