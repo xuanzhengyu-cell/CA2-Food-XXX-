@@ -310,18 +310,15 @@ app.get('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
             return res.redirect('/profile');
              }
 
-        res.render('HP_P_edit_user', {});
+        res.render('HP_P_edit_user', {
+         user: results[0]
+        });
     });
 });
 
 // post of edit_user (may remove the ability to edit ur role based on future discussion.)
 app.post('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
-    const id = req.params.id;
-
-    if (req.session.user.user_id != id && req.session.user.role !== "admin") {
-        req.flash('error', 'Access denied');
-        return res.redirect('/profile');
-    }
+    const id = req.session.user.user_id;
 
     const { username, password, role } = req.body;
     const sql = `
