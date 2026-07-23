@@ -595,7 +595,7 @@ app.post('/location/:id/message', checkAuthenticated, checkGOwnerAdminandMember,
     const sender_id = req.session.user.user_id
     const {title, content} = req.body 
     const sql = `
-        INSERT INTO comments (location_id, sender_id, title, text)
+        INSERT INTO messages (location_id, sender_id, title, text)
         VALUES (?, ?, ?, ?)`
     connection.query(sql, [location_id, sender_id, title, content], (err) => {
         if (err) {
@@ -630,7 +630,7 @@ app.post('/location/:location_id/message/edit/:message_id', checkAuthenticated, 
     const sql = `
         UPDATE messages 
         SET title = ?, text = ?
-        WHERE location_id = ? AND message_id = ?`
+        WHERE location_id = ? AND messages_id = ?`
     connection.query(sql, [title, content, location_id, message_id], (err) =>{
         if (err) {
             console.log (err) 
@@ -645,7 +645,7 @@ app.post('/location/:location_id/message/delete/:message_id', checkAuthenticated
     const location_id = parseInt(req.params.location_id); 
     const sql = `
         DELETE FROM messages
-        WHERE location_id = ? AND message_id = ?`
+        WHERE location_id = ? AND messages_id = ?`
     connection.query(sql, [location_id, message_id], (err) =>{
         if (err) {
             console.log(err)
