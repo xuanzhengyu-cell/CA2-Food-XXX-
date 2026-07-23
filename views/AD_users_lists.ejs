@@ -30,7 +30,7 @@
                     
                     <tr>
                         <td>
-                            <form action="/admin/changeName/<%= user.user_id %>" method="POST">
+                            <form action="/admin/changeName/<%= user.user_id %>" method="POST" >
                                 <input type="text" id="username" name="username" class="form-control" placeholder="Username" value="<%= user.username %>" required>
                                 <button type="submit" class="btn btn-success btn-sm mt-2">Update</button> <a href="/user/<%= user.user_id %>" class="btn btn-primary btn-sm mt-2"> Profile</a>
                             </form>

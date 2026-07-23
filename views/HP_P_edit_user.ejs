@@ -15,38 +15,42 @@
         <div class="container mt-4">
 
             <h2>Edit Profile</h2>
-            <form action="/profile/edit" method="POST">
+            <form action="/profile/edit" method="POST" enctype="multipart/form-data">
 
                 <!-- user id -->
                 <div class="mb-3">
-                    <label>User ID</label>
-                    <input type="text" class="form-control" value="<%= user.user_id %>" readonly>
+                    <label>Profile Picture</label>
+                    <input class="form-control" type="file" id="image" name="image" accept="image/*" value="<%= user.image %>" >
                 </div>
 
                 <!-- user name -->
                 <div class="mb-3">
                     <label>Username</label>
-                    <input type="text" name="username" class="form-control" value="<%= user.username %>" required>
+                    <input type="text" name="username" class="form-control" value="<%= user.username %>" >
                 </div>
-
-                <!-- user ps -->
-                <div class="mb-3">
-                    <label>New Password</label>
-                    <input type="password" name="password" class="form-control"
-                        placeholder="Leave blank if you don't want to change it">
-                </div>
-
-
 
                         <button type="submit" class="btn btn-success">
                             Save Changes
                         </button>
 
-                        <a href="/profile" class="btn btn-secondary">
+            </form>
+            <br><br><br>
+            <h2>Edit Password</h2>
+            <form action="/profile/password" method="POST">
+                <!-- user ps -->
+                <div class="mb-3">
+                    <label>New Password</label>
+                    <input type="password" name="password" class="form-control"
+                        placeholder="Enter new password"> 
+                </div>
+                <button type="submit" class="btn btn-success">
+                            Save Changes
+                        </button>
+            </form>
+            <br>
+            <a href="/profile" class="btn btn-secondary">
                             Cancel
                         </a>
-            </form>
-
         </div>
 </body>
 

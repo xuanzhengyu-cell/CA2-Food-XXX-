@@ -12,7 +12,7 @@
 
         <!-- Profile Picture -->
     <div class="container mt-4">
-        <% if (users.image != "null") { %>
+        <% if (users.image == "null") { %>
             <img src="/images/nobody.jpg" alt="Profile Picture" width="150">
         <% } else { %>
             <img src="/images/<%= users.image %>" alt="Profile Picture" width="150">
@@ -68,19 +68,23 @@
         <% } else { %>
             <% comments.forEach(function(comment){ %>
                 <div>
-                    <br>
-                        <%= comment.comments_text %>
-                    <br>
-                        <%= comment.date %>
-                    <br>
-                    <a href="/user/<%= comment.owner_id %>/comment/edit/<%= comment.comments_id %>" class="btn btn-warning btn-sm">
-                        Edit Comment
-                    </a>
-                    <form action="/user/<%= comment.owner_id %>/comment/delete/<%= comment.comments_id %>" method="POST" class="d-inline">
-                        <button class="btn btn-danger btn-sm">
-                            Delete Comment
-                        </button>
-                    </form>
+                    <div class="border rounded p-2 mb-2">
+                        <p>
+                            <%= comment.comments_text %>
+                        </p>
+                        <p>
+                            <%= comment.date %>
+                        </p>
+                    </div>
+                    <% if (comment.owner_id == user.user_id || comment.sender_id == user.user_id || userRoles?.role == "admin") {%>
+                        <a href="/user/<%= comment.owner_id %>/comment/edit/<%= comment.comments_id %>" class="btn btn-warning btn-sm">Edit Comment</a>
+
+                        <form action="/user/<%= comment.owner_id %>/comment/delete/<%= comment.comments_id %>" method="POST" class="d-inline">
+                            <button class="btn btn-danger btn-sm">
+                                Delete Comment
+                            </button>
+                        </form>
+                    <% } %>
                     <hr>
                 </div>
             <% }) %>

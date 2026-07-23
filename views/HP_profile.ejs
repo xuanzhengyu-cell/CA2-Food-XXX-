@@ -15,10 +15,11 @@
             <div class="card mb-4">
                 <div class="card-body text-center">
                     <h2>
-                        <%= user.username %>
+                        <%= users.username %>
                     </h2>
                 </div>
             </div>
+            <br>
 
             <!-- User Details -->
             <div class="card mb-4">
@@ -26,15 +27,17 @@
 
                     <h4>Profile Information</h4>
 
-                    <p><strong>User ID:</strong>
-                        <%= user.user_id %>
-                    </p>
+                    <% if (users.image == "null") { %>
+                        <img src="/images/nobody.jpg" alt="Profile Picture" width="150">
+                    <% } else { %>
+                        <img src="../images/<%= users.image %>" alt="Profile Picture" width="150">
+                    <% } %>
 
                     <p><strong>Role:</strong>
-                        <%= user.role %>
+                        <%= users.role %>
                     </p>
 
-                    <% if(user.role==="admin" ){ %>
+                    <% if(users.role==="admin" ){ %>
 
                         <p><strong>Status:</strong> Administrator</p>
 
@@ -74,7 +77,14 @@
                             <div class="border rounded p-2 mb-2">
                                 <p>
                                     <%= comment.comments_text %>
+                                    <br>
+                                    <%= comment.date %>
                                 </p>
+                                <form action="/user/<%= comment.owner_id %>/comment/delete/<%= comment.comments_id %>" method="POST" class="d-inline">
+                                    <button class="btn btn-danger btn-sm">
+                                        Delete Comment
+                                    </button>
+                                </form>
                             </div>
                         <% }) %>
                     <% } %>

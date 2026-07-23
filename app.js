@@ -7,12 +7,12 @@ const app = express();
 const multer = require ('multer');
 
 const storage = multer.diskStorage({
-destination: (req, file, cb) => {
-cb(null, 'public/images'); 
-},
-filename: (req, file, cb) => {
-cb(null, file.originalname); 
-}
+    destination: (req, file, cb) => {
+        cb(null, 'public/images'); 
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname); 
+    }
 });
 const upload = multer({ storage: storage });
  
@@ -65,7 +65,7 @@ const locationIDs_Find = (req, res, next) => {
         const user_id = req.session.user.user_id;
         const sql = `SELECT location.location_id, location.location_name 
                         FROM location 
-                        INNER JOIN users_has_location 
+                        LEFT JOIN users_has_location 
                         ON location.location_id = users_has_location.location_id 
                         WHERE user_id = ?`;            
         connection.query(sql, [user_id], (err, results) => {
@@ -179,7 +179,7 @@ app.post('/login', (req, res) => {
     const sql = `
         SELECT users.user_id, users.role, users_has_location.group_role
         FROM users 
-        INNER JOIN users_has_location ON users_has_location.user_id = users.user_id 
+        LEFT JOIN users_has_location ON users_has_location.user_id = users.user_id 
         WHERE users.username = ? AND users.password = SHA2(?, 256)`;
     connection.query(sql, [username, password], (err, results) => {
         if (err) {
@@ -233,7 +233,7 @@ app.get('/profile', checkAuthenticated, locationIDs_Find, (req, res) => {
     const id = req.session.user.user_id;
 
     const userSql = "SELECT * FROM users WHERE user_id = ?";
-    const commentSql = "SELECT comments_text FROM comments";
+    const commentSql = "SELECT * FROM comments";
 
     connection.query(userSql, [id], (err, userResult) => {
         if (err) throw err;
@@ -242,7 +242,7 @@ app.get('/profile', checkAuthenticated, locationIDs_Find, (req, res) => {
             if (err) throw err;
 
             res.render('HP_profile', {
-                user: userResult[0],
+                users: userResult[0],
                 comments: commentResult
             });
         });
@@ -268,22 +268,46 @@ app.get('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
 });
 
 // post of edit_user (may remove the ability to edit ur role based on future discussion.)
-app.post('/profile/edit', checkAuthenticated, locationIDs_Find, (req, res) => {
+app.post('/profile/edit', checkAuthenticated, locationIDs_Find, upload.single('image'), (req, res) => {
     const id = req.session.user.user_id;
+    const { username } = req.body;
 
-    const { username, password, role } = req.body;
+    let image;
+    if (req.file) {
+        image = req.file.filename; // Save only the filename
+    } else {
+        image = "null";
+    }
     const sql = `
         UPDATE users
-        SET username = ?, password = SHA2(?,256), role = ?
+        SET username = ?, image = ?
         WHERE user_id = ?
     `;
-    connection.query(sql, [username, password, role, id], (err) => {
+    connection.query(sql, [username, image, id], (err) => {
 
         if (err) {
-            throw err
+            console.log(err) 
         };
         req.session.user.username = username;
-        req.session.user.role = role;// may remove this based on future discussion.
+        req.flash('success', 'Profile updated successfully.'); 
+        res.redirect('/profile');
+    });
+});
+
+app.post('/profile/password', checkAuthenticated, locationIDs_Find, (req, res) => {
+    const id = req.session.user.user_id;
+    const { password } = req.body;
+
+    const sql = `
+        UPDATE users
+        SET password = SHA2 (?, 256)
+        WHERE user_id = ?
+    `;
+    connection.query(sql, [password, id], (err) => {
+
+        if (err) {
+            console.log(err) 
+        };
         req.flash('success', 'Profile updated successfully.'); 
         res.redirect('/profile');
     });
@@ -349,7 +373,7 @@ app.post('/clear_announcement', (req, res) => {
 })
 
 // Display all existing location groups
-app.get('/groups', checkAuthenticated, locationIDs_Find, (req, res) => {
+app.get('/groups', checkAuthenticated, locationIDs_Find,  (req, res) => {
     const sql = "SELECT * FROM location";
     connection.query(sql, (err, results) => {
         if (err) {
@@ -369,28 +393,45 @@ app.get('/groups', checkAuthenticated, locationIDs_Find, (req, res) => {
     
 })
 
-app.post('/create_location', (req, res) => {
-    const {location_name, image, username} = req.body
-
+app.post('/create_location', upload.single('image'), (req, res) => {
+    const {location_name, user_id} = req.body
+    
+    let image;
+    if (req.file) {
+        image = req.file.filename; // Save only the filename
+    } else {
+        image = null;
+    }
+    
     const sql = `
         INSERT INTO location (location_name, Images)
         VALUES (?, ?)`
-    connection.query(sql, [location_name, image], (err, results) => {
+    connection.query(sql, [location_name, image], (err) => {
         if (err) {
-            console.error('Failed:', err.message);
+            console.log('Failed:', err.message);
         } else {
-            const location_id = results.location_id
-            const role = "group_owner"
             const sql = `
-                INSERT INTO users_has_location (location_id, user_id, group_role)
-                VALUES (?, ?, ?)`
-            connection.query (sql, [location_id, username, role], (err) => {
+                SELECT location_id 
+                FROM location
+                WHERE location_name = ?`
+            connection.query (sql, [location_name], (err, results) => {
                 if (err) {
                     console.log(err)
                 } else {
-                    res.redirect("/groups")
+                    const location_id = results[0].location_id
+                    const role = "group_owner"
+                    const sql = `
+                        INSERT INTO users_has_location (location_id, user_id, group_role)
+                        VALUES (?, ?, ?)`
+                    connection.query (sql, [location_id, user_id, role], (err) => {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            res.redirect("/groups")
+                        }
+                    }) 
                 }
-            })  
+            })
         }
     })
 })
@@ -516,16 +557,26 @@ const admin_group_owner_or_member = (req, res, next) => {
     const location_id = parseInt(req.params.id);
 
     const sql1 = `
-        SELECT users.role, users_has_location.group_role
+        SELECT users.role
         FROM users 
-        INNER JOIN users_has_location ON users_has_location.user_id = users.user_id
-        WHERE users.user_id = ? AND users_has_location.location_id = ?`
-    connection.query(sql1, [user_id, location_id], (err, result) => {
+        WHERE users.user_id = ?`
+    connection.query(sql1, [user_id], (err, result) => {
         if (err) {
             console.log (err)
         } else {
-            req.userRoles = result
-            return next()
+            req.userRoles = result[0]
+            const sql1 = `
+                SELECT users_has_location.group_role
+                FROM users_has_location 
+                WHERE users_has_location.user_id = ? and users_has_location.location_id = ?`
+            connection.query(sql1, [user_id, location_id], (err, result) => {
+                if (err) {
+                    console.log (err)
+                } else {
+                    req.userGroupRoles = result[0]
+                    return next()
+                }
+            })
         }
     })
 };
@@ -548,7 +599,7 @@ app.get('/location/:id', locationIDs_Find, admin_group_owner_or_member, (req, re
                 let messages = results_m
                 const location_id = id
                 res.render('GP_location', 
-                    { location_id, location_name, messages, userRoles: req.userRoles});
+                    { location_id, location_name, messages, userRoles: req.userRoles, userGroupRoles: req.userGroupRoles});
             }
         });
         }
@@ -563,26 +614,28 @@ app.get('/location/:id', locationIDs_Find, admin_group_owner_or_member, (req, re
 
 // Check Group Owner + Member + admin (For sending messages in the location groups)
 const checkGOwnerAdminandMember = (req, res, next) => {
-    const location_id = req.params.id
-    if (req.session.user.role === 'admin') {
+    const location_id = req.params.location_id || req.params.id;
+    const user_id = req.session.user?.user_id;
+
+    if (req.session.user?.role === 'admin') {
         return next();
     }
-    const sql = `SELECT group_role FROM users_has_location WHERE user_id = ?`
-    connection.query (sql, [req.session.user.user_id], (err, results) => {
-        if (err) {
-            console.log (err)
-        } else {
-            const group_role = results [0]
-            if (group_role === "group_owner" && String(req.session.user.location_id) === String(location_id)) {
-                return next();
-            }
-            if (group_role === "group_member" && String(req.session.user.location_id) === String(location_id)) {
-                return next();
-            }
+
+    const sql = `SELECT group_role FROM users_has_location WHERE user_id = ? AND location_id = ?`;
+    connection.query(sql, [user_id, location_id], (err, results) => {
+        if (err || results.length === 0) {
             req.flash('error', 'Access denied');
-            res.redirect('/');
+            return res.redirect(`/location/${location_id}`);
         }
-    })
+
+        const role = results[0].group_role;
+        if (role === 'group_owner' || role === 'group_member') {
+            return next();
+        }
+
+        req.flash('error', 'Access denied');
+        res.redirect(`/location/${location_id}`);
+    });
 };
 
 app.get('/location/:location_id/message', checkAuthenticated, locationIDs_Find, checkGOwnerAdminandMember, (req, res) => {
@@ -590,7 +643,7 @@ app.get('/location/:location_id/message', checkAuthenticated, locationIDs_Find, 
     res.render('GP_message_create', {location_id: location_id});
 });
 
-app.post('/location/:location_id/message', checkAuthenticated, checkGOwnerAdminandMember, (req,res) => {
+app.post('/location/:location_id/message_create', checkAuthenticated, checkGOwnerAdminandMember, (req,res) => {
     const location_id = parseInt(req.params.location_id);
     const sender_id = req.session.user.user_id
     const {title, content} = req.body 
@@ -765,9 +818,15 @@ app.get('/location/edit/:location_id', checkAuthenticated, locationIDs_Find, che
 });
 
 // edit for location (post)
-app.post('/location/edit/:location_id', checkAuthenticated, checkGOwnerandAdmin, (req, res) => {
+app.post('/location/edit/:location_id', checkAuthenticated, checkGOwnerandAdmin, upload.single('image'), (req, res) => {
     const location_id = req.params.location_id;
-    const { location_name, image } = req.body;
+    const { location_name } = req.body;
+    let image;
+    if (req.file) {
+        image = req.file.filename; // Save only the filename
+    } else {
+        image = null;
+    }
     const sql = `
         UPDATE location
         SET location_name = ?, Images = ?
@@ -819,8 +878,26 @@ app.post('/location/edit/:location_id/deleteUser/:user_id', checkAuthenticated, 
 // User (Comments) Routes
 // =============================================================================================================================
 
+const admin_profile_owner_or_sender = (req, res, next) => {
+    const user_id = req.session.user?.user_id
+    const owner_id = parseInt(req.params.id);
+
+    const sql1 = `
+        SELECT users.role
+        FROM users 
+        WHERE users.user_id = ?`
+    connection.query(sql1, [user_id], (err, result) => {
+        if (err) {
+            console.log (err)
+        } else {
+            req.userRoles = result[0]
+            return next()
+        }
+    })
+};
+
 // get user page (dynamic)
-app.get('/user/:id', locationIDs_Find, (req, res) => {
+app.get('/user/:id', locationIDs_Find, admin_profile_owner_or_sender, (req, res) => {
     const id = parseInt(req.params.id);
     const user_id = id
     const sql1 = 'SELECT users.username, users.image, users.details FROM users WHERE user_id = ?';
@@ -845,7 +922,7 @@ app.get('/user/:id', locationIDs_Find, (req, res) => {
                         console.log(err)
                     } else {
                         const locations = results 
-                        res.render('GP_user', {user_id, users, comments, locations});
+                        res.render('GP_user', {user_id, users, comments, locations, userRoles: req.userRoles});
                     }
                 })
             }
@@ -904,8 +981,7 @@ app.get('/user/:owner_id/comment/edit/:comments_id', checkAuthenticated, locatio
         }
 
         res.render('US_edit_comment', {
-            comment: results[0],
-            logged_in
+            comments: results[0],
         });
     });
 });
@@ -934,7 +1010,7 @@ app.post('/user/:owner_id/comment/delete/:comments_id', checkAuthenticated, (req
         DELETE FROM comments
         WHERE comments_id = ? AND owner_id = ?
     `;
-    connection.query(sql, [comments_id, owner_id], (err) => {
+    connection.query(sql1, [comments_id, owner_id], (err) => {
         if (err) {
             console.log(err);
         } else {

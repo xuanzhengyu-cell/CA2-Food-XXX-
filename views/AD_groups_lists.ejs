@@ -17,12 +17,12 @@
 <div class="container mt-5">
     <div>
         <h2>Create New Group</h2>
-        <form action="/create_location" method="post">
+        <form action="/create_location" method="post" enctype="multipart/form-data">
             <input type="text" id="location_name" name="location_name" class="form-control" placeholder="Name of New Location" required>
             <br>
             <input class="form-control" type="file" id="image" name="image" accept="image/*" >
             <br>
-            <select name="username" class="form-select">
+            <select name="user_id" class="form-select">
             <% users.forEach(users => { %>
                 <% if (users.role == "admin") { %>
                     <option value="<%= users.user_id %>" disabled>
