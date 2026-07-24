@@ -1,0 +1,165 @@
+Note: Our Theme will be on Food Stores in Locations
+
+Assets
+- 4 sql tables: one for username + password +  user id + roles + location id (if any) 
+                one for location id, location name
+                one for messages id, location id, owner_id, sender_id, text, date, likes
+                one for comments id, user id,  comments text
+- 4 (? may add more) positions. 
+- Projected pages: Login page, Home page (*display all groups existing + admin messages), Group page (to display data), Adding page, Editing page, 
+                   Admin's Page (for site mods), Group Owner Page (for group page mods), (? more to be added), User Page (for personal mods)
+   - Typically: 
+    - Site Admins can CRUD everything and grant other users up to Admin permissions. 
+      - They can post messages onto the main home page that only group owners and admins can see. 
+      - They can also hold permission to create a new group. 
+      - They can kick and add users into groups freely.  
+      - They are the site admins. 
+
+    - Group Owners can CRUD everything in their group, but will have the same privilege in other groups as per normal users. 
+      - They can give others permission up to group owner ONLY for their OWN group.
+      - They can ONLY kick and add people into their OWN group. 
+      - They are the location shop owners (Lot One, Jurong Point etc). 
+
+    -  Group Members can CRUD their OWN messages in the group they belong to, and the rest is the same as a group user. 
+      - They are the shop/stall owners (McDonald's, KFC, etc)
+
+    -  Normal users can: 
+      - They can CRUD their own comments 
+      - They are the normal users of the website. 
+ 
+    - Non-authorised users can only read; they cannot do anything else. 
+
+- Regardless, remember to ensure that the SQL table (for data) can accept it.  
+Note that the encryption of the password is SHA2 (?, 256)
+
+Table Variables
+side note:
+- Table 1: users
+  - user_id
+  - username
+  - password
+  - role (admin / group_owner / group_member / normal_user)
+
+- Table 2: location
+  - location_id
+  - location_name
+
+- Table 3: users_has_location
+  - user_id
+  - location_id
+
+- Table 4: messages
+  - messages_id
+  - location_id (The page that has the message)
+  - sender_id (user_id of the user who sent the message)
+  - message_text
+  - date
+  - likes
+
+- Table 5: comments 
+  - comments_id
+  - sender_id
+  - owner_id (The user whose page has this comment)
+  - comments_text
+  - date 
+
+
+All routes:
+- get('/'                     
+~ to home page [Home_Page.ejs]
+
+
+// Login + Registration Routes
+- get('/login'                
+~ to login page [HP_login.ejs]
+
+- get('/register'             
+~ from login to registration page [HP_register.ejs]
+
+- post('/login'               
+~ process form reply from login page [HP_login.ejs]
+
+- post('/register'            
+~ process form reply from registration page [HP_register.ejs]
+
+- get('/logout'               
+~ end the session of the user 
+
+
+// Profile Routes
+- get('/profile'              
+~ from home to user own page [HP_profile]
+
+- get('/profile/edit'
+~ from user own page to edit user own page page [HP_P_edit_user.ejs]
+
+- post('/profile/edit'
+~ process changes done to the user's own profile
+
+
+// Admin Dashboard Routes
+- get('/admin_dashboard'      
+~ from home to admin_dashboard [HP_admin_dashboard.ejs]
+
+- get('/groups'               
+~ from admin_dashboard [HP_admin_dashboard.ejs] to all groups list [AD_groups_lists.ejs]
+
+- post('/delete_location/:id'
+~ delete a location group with all of its related things (group, messages and members in the location)
+
+- get('/users'
+~ go to display all users page
+
+
+// Location Route
+- get('/location/:id' 
+~ from home page [Home_Page.ejs] to the target location group page [GP_location.ejs]
+
+
+// Location (Message) Routes
+- get('/location/:id/message' 
+~ from group location [GP_location.ejs] to message creation [GP_message_create.ejs]
+
+- post('/location/:id/message' 
+~ process the message creation from the form 
+
+- get('/location/:id/message/edit/:id'
+~ go to page to edit message in the group [GP_edit_message]
+
+- post('/location/:id/message/edit/:id'
+~ process the changes to the message from the form [GP_edit_message]
+
+- post('/location/:id/message/delete/:id'
+~ delete a message at a location 
+
+// Location (Members) Routes
+- get('/location_members/:id'
+~ from location group page [GP_location.ejs] to members list page [GP_Group_Members.ejs]
+
+` 
+// Location (Dashboard) Routes
+- get('/location/edit/:id'
+~ from location group page [GP_location.ejs] to group owner dashboard [GP_Owner_dashboard.ejs]
+
+- post('/location/edit/:id'
+~ process the changes made in the dashboard [GP_Owner_dashboard.ejs]
+
+
+
+
+
+// User (Comments) Routes
+- get('/user/:id' 
+~ from members list page [GP_Group_Members.ejs] to user profile page [GP_user.ejs]
+
+- get('/user/:id/comment_create'
+~ from user profile page [GP_user.ejs] to comment creation page [US_comment_create.ejs]
+
+- post('/user/:id/comment_create'
+~ process form reply from the comment adding page [US_comment_create.ejs]
+
+- get('/comment/edit/:id'
+~ go to page to edit comments in the user profile page [US_edit_comment]
+
+- post('/comment/edit/:id'
+~ process the changes to the comments from the form [US_edit_comment]
