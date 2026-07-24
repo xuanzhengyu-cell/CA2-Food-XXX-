@@ -17,7 +17,7 @@
     "express-session": "^1.19.0",
     "multer": "^2.2.0",
     "mysql2": "^3.22.6"
-  },
+},
   "devDependencies": {},
   "repository": {
     "type": "git",
@@ -27,14 +27,4 @@
     "url": "https://github.com/xuanzhengyu-cell/CA2/issues"
   },
   "homepage": "https://github.com/xuanzhengyu-cell/CA2#readme"
-    "mysql2": "^3.23.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/xuanzhengyu-cell/CA2-Food-XXX-.git"
-  },
-  "bugs": {
-    "url": "https://github.com/xuanzhengyu-cell/CA2-Food-XXX-/issues"
-  }, {
-  "homepage": "https://github.com/xuanzhengyu-cell/CA2-Food-XXX-#readme"
 }
